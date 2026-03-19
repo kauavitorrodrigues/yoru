@@ -8,10 +8,13 @@ import qs.services
 Button {
 
     id: root
+
     property var appToplevel
     property var appListRoot
     property int lastFocused: -1
-    property real iconSize: 35
+    property real iconSize: 30
+    property real countDotWidth: 10
+    property real countDotHeight: 4
     property var desktopEntry: appToplevel ? DesktopEntries.heuristicLookup(appToplevel.appId) : null
 
     implicitWidth: iconSize
@@ -23,7 +26,7 @@ Button {
         width: root.iconSize * 1.25
         height: root.iconSize * 1.25
         anchors.centerIn: parent
-        color: '#6de5dfed'
+        color: Qt.rgba(0.9, 0.87, 0.93, 0.45)
         radius: 10
         opacity: 0
 
@@ -79,6 +82,26 @@ Button {
 
         onEntered: hoverBg.opacity = 0.3
         onExited: hoverBg.opacity = 0
+    }
+
+    RowLayout {
+        spacing: 3
+        anchors {
+            top: iconImageLoader.bottom
+            topMargin: 3
+            horizontalCenter: parent.horizontalCenter
+        }
+
+        Repeater {
+            model: Math.min(root.appToplevel?.toplevels?.length || 0, 3)
+            delegate: Rectangle {
+                radius: 999
+                implicitWidth: root.countDotHeight
+                implicitHeight: root.countDotHeight
+                color: (root.appToplevel?.toplevels?.some(t => t.activated) || false)
+                    ? Qt.rgba(1, 1, 1, 0.78) : Qt.rgba(1, 1, 1, 0.41)
+            }
+        }
     }
 
 }

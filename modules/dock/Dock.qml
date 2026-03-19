@@ -22,7 +22,7 @@ Scope {
             required property var modelData
 
             color: "transparent"
-            implicitHeight: 55
+            implicitHeight: 50
             margins.bottom: 8
             WlrLayershell.namespace: "quickshell:dock"
 
@@ -57,7 +57,7 @@ Scope {
                         anchors.fill: parent
                         anchors.topMargin: 0
                         anchors.bottomMargin: 0
-                        color: Qt.rgba(0.08, 0.07, 0.07, 0.38)
+                        color: Qt.rgba(0.08, 0.07, 0.07)
                         border.width: 1
                         border.color: "transparent"
                         radius: 13
@@ -72,6 +72,7 @@ Scope {
                             fill: parent
                             leftMargin: padding
                             rightMargin: padding
+                            bottomMargin: 2
                         }
 
                         DockApps {
