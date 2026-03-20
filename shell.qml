@@ -3,6 +3,6 @@ import "modules/dock"
 import Quickshell
 
 ShellRoot {
-    // TopBar {}
+    TopBar {}
     Dock {}
 }
