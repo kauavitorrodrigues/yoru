@@ -55,28 +55,67 @@ Fuzzy application search using FuzzySort with a smart icon resolution fallback c
 **Workspace Switching**
 Hyprland workspace integration with numbered buttons (1–9) dispatched over IPC.
 
+## Installation
+
+> **Arch Linux only** for now.
+
+Clone the repo and run the install script:
+
+```bash
+git clone https://github.com/kauavitorrodrigues/yoru
+cd yoru
+./install.sh
+```
+
+The script will:
+
+1. Install `yay` if not present
+2. Install all required packages via `pacman` and `yay`
+3. Create a persistent virtual **Spotify Sink** in PipeWire — Spotify routes here so CAVA can capture it in isolation, and a loopback forwards the audio back to your real output so you can still hear it
+4. Add a WirePlumber rule that automatically routes Spotify to that sink on launch
+5. Copy the CAVA config to `~/.config/cava/configs/yoru.conf`
+6. Symlink the repo to `~/.config/quickshell/yoru`
+
+Then start Yoru:
+
+```bash
+quickshell -p ~/.config/quickshell/yoru
+```
+
+Or add it to `hyprland.conf` to launch on startup:
+
+```ini
+exec-once = quickshell -p ~/.config/quickshell/yoru
+```
+
+### Audio visualization note
+
+After the first Spotify launch post-install, WirePlumber should automatically route it to the **Yoru Spotify Sink**. You should hear audio normally and see the waveform in the player widget.
+
+If something doesn't work:
+
+- **No waveform / can't hear Spotify** — open `pavucontrol`, go to the **Playback** tab, and manually set Spotify's output to *Yoru Spotify Sink*. The loopback will then forward it to your real output.
+- **Waveform works but no sound** — the loopback may not have linked correctly. Re-run `./install.sh` and restart Spotify.
+
+> WirePlumber 0.5+ is required for the automatic routing rule. Older setups will need the manual `pavucontrol` step.
+
 ## Dependencies
 
-**Required:**
-- [Quickshell](https://quickshell.org/) — shell framework
+The install script handles all of these automatically on Arch.
+
+| Package | Source | Purpose |
+|---------|--------|---------|
+| `quickshell-git` | AUR (`yay`) | Shell framework |
+| `pipewire` | pacman | Audio backend |
+| `wireplumber` | pacman | PipeWire session manager |
+| `pipewire-pulse` | pacman | PulseAudio compatibility layer |
+| `cava` | pacman | Audio visualizer (waveform) |
+
+**Also required (install manually):**
 - [Hyprland](https://hyprland.org/) — Wayland compositor
-- [Pipewire](https://pipewire.org/) — audio backend
-- [CAVA](https://github.com/karlstav/cava) — audio visualizer (for waveform)
 - `pavucontrol` — volume control GUI
-- `foot` — terminal (used for pw-top)
+- `foot` — terminal (used for pw-top shortcut)
 - JetBrainsMono Nerd Font
-
-## Running
-
-```bash
-quickshell -p /path/to/yoru
-```
-
-Or from within the repo:
-
-```bash
-quickshell -p .
-```
 
 ## Structure Details
 
