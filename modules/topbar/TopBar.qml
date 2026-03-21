@@ -1,8 +1,10 @@
+import "../player"
 import "./widgets"
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
+import Quickshell.Io
 import Quickshell.Wayland
 
 PanelWindow {
@@ -11,7 +13,7 @@ PanelWindow {
     color: "transparent"
     focusable: false
     aboveWindows: true
-    implicitHeight: 40
+    implicitHeight: leftSection.implicitHeight
 
     anchors {
         top: true
@@ -33,13 +35,17 @@ PanelWindow {
         // Left
         RowLayout {
             id: leftSection
+
+            spacing: 10
+
             anchors {
                 left: parent.left
                 verticalCenter: parent.verticalCenter
             }
-            spacing: 10
 
             WorkSpaces {}
+            Player {}
+
         }
 
         // Center

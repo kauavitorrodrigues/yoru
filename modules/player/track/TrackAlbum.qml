@@ -1,0 +1,78 @@
+import QtQuick
+import qs.services
+
+Item {
+    id: root
+
+    property real size: 30
+
+    implicitWidth: size
+    implicitHeight: size
+
+    Rectangle {
+        anchors.fill: parent
+        radius: 5
+        clip: true
+        color: "transparent"
+
+        Image {
+            id: imgA
+
+            anchors.fill: parent
+            fillMode: Image.PreserveAspectCrop
+            cache: false
+            asynchronous: true
+            source: PlayerService.artUrl
+        }
+
+        Image {
+            id: imgB
+
+            anchors.fill: parent
+            fillMode: Image.PreserveAspectCrop
+            cache: false
+            asynchronous: true
+            opacity: 0
+        }
+
+        Connections {
+            function onArtUrlChanged() {
+                imgB.source = PlayerService.artUrl;
+            }
+
+            target: PlayerService
+        }
+
+        Connections {
+            function onStatusChanged() {
+                if (imgB.status === Image.Ready)
+                    fadeAnim.start();
+
+            }
+
+            target: imgB
+        }
+
+        SequentialAnimation {
+            id: fadeAnim
+
+            NumberAnimation {
+                target: imgB
+                property: "opacity"
+                to: 1
+                duration: 300
+                easing.type: Easing.InOutQuad
+            }
+
+            ScriptAction {
+                script: {
+                    imgA.source = imgB.source;
+                    imgB.opacity = 0;
+                }
+            }
+
+        }
+
+    }
+
+}
