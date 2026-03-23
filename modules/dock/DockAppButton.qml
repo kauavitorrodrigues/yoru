@@ -79,9 +79,18 @@ Button {
             root.desktopEntry?.execute();
             event.accepted = true;
         }
+        
+        onEntered: {
+            hoverBg.opacity = 0.3
+            root.appListRoot.lastHoveredButton = root
+            root.appListRoot.buttonHovered = true
+        }
 
-        onEntered: hoverBg.opacity = 0.3
-        onExited: hoverBg.opacity = 0
+        onExited: {
+            hoverBg.opacity = 0
+            root.appListRoot.buttonHovered = false
+        }
+
     }
 
     RowLayout {
