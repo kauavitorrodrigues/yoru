@@ -194,7 +194,37 @@ Item {
                             id: windowButton
                             required property var modelData
                             property bool hasContent: screencopyView.hasContent
+                            property bool entered: false
                             padding: 0
+                            opacity: (previewPopup.show && entered) ? 1 : 0
+                            scale: windowButton.hovered ? 1.03 : 1
+
+                            Component.onCompleted: entered = true
+
+                            transform: Translate {
+                                y: (previewPopup.show && entered) ? 0 : 8
+
+                                Behavior on y {
+                                    NumberAnimation {
+                                        duration: Appearance.animation.normal
+                                        easing.type: Appearance.animationCurves.outCubic
+                                    }
+                                }
+                            }
+
+                            Behavior on opacity {
+                                NumberAnimation {
+                                    duration: Appearance.animation.normal
+                                    easing.type: Appearance.animationCurves.outCubic
+                                }
+                            }
+
+                            Behavior on scale {
+                                NumberAnimation {
+                                    duration: Appearance.animation.fast
+                                    easing.type: Appearance.animationCurves.inOutQuad
+                                }
+                            }
 
                             onClicked: { windowButton.modelData?.activate(); }
 
