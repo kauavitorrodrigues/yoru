@@ -13,6 +13,7 @@ Singleton {
     property bool ready: false
 
     property alias dock: settingsJsonAdapter.dock
+    property alias topbar: settingsJsonAdapter.topbar
 
     function setDockPinnedApps(appIds) {
         settingsJsonAdapter.dock.pinnedApps = appIds;
@@ -53,6 +54,13 @@ Singleton {
 
             property JsonObject dock: JsonObject {
                 property list<string> pinnedApps: []
+            }
+
+            property JsonObject topbar: JsonObject {
+                property JsonObject workspaces: JsonObject {
+                    property int defaultCount: 5
+                    property int maxCount: 10
+                }
             }
         }
     }

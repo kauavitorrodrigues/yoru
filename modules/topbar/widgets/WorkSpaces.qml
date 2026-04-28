@@ -3,10 +3,19 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Hyprland
+import "../../../services"
 import "../../common"
 
 Item {
     id: root
+
+    readonly property int defaultWorkspaceCount: Math.max(1, Settings.topbar.workspaces.defaultCount ?? 5)
+    readonly property int maxWorkspaceCount: Math.max(root.defaultWorkspaceCount, Settings.topbar.workspaces.maxCount ?? 10)
+    readonly property int focusedWorkspaceId: Hyprland.focusedWorkspace?.id ?? 1
+    readonly property int workspaceCount: Math.min(
+        root.maxWorkspaceCount,
+        Math.max(root.defaultWorkspaceCount, root.focusedWorkspaceId)
+    )
 
     implicitWidth: row.implicitWidth + 20
     implicitHeight: row.implicitHeight + 10
@@ -23,7 +32,7 @@ Item {
         spacing: 0
 
         Repeater {
-            model: Hyprland.workspaces
+            model: root.workspaceCount
 
             delegate: Button {
 
