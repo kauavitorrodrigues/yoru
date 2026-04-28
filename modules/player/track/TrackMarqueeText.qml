@@ -1,12 +1,13 @@
 import QtQuick
+import "../../common"
 
 Item {
     id: root
 
     property string text: ""
     property real maxWidth: 150
-    property color color: Qt.rgba(1, 1, 1)
-    property int fontSize: 13
+    property color color: Appearance.colors.textPrimary
+    property int fontSize: Appearance.fonts.sizes.md
     property bool fontBold: false
     readonly property bool _shouldScroll: metrics.width > maxWidth
 
@@ -45,6 +46,7 @@ Item {
 
         text: root.text
         color: root.color
+        font.family: Appearance.fonts.primary
         font.pixelSize: root.fontSize
         font.bold: root.fontBold
         x: 0
@@ -71,7 +73,7 @@ Item {
     Timer {
         id: startDelay
 
-        interval: 1500
+        interval: Appearance.animation.marqueePause
         repeat: false
         onTriggered: scrollAnim.start()
     }
@@ -90,23 +92,23 @@ Item {
             property: "x"
             to: -(metrics.width - root.maxWidth + 10)
             duration: Math.max(25000, (metrics.width - root.maxWidth) * 40)
-            easing.type: Easing.Linear
+            easing.type: Appearance.animationCurves.linear
         }
 
         PauseAnimation {
-            duration: 1500
+            duration: Appearance.animation.marqueePause
         }
 
         NumberAnimation {
             target: label
             property: "x"
             to: 0
-            duration: 800
-            easing.type: Easing.InOutQuad
+            duration: Appearance.animation.slow
+            easing.type: Appearance.animationCurves.inOutQuad
         }
 
         PauseAnimation {
-            duration: 800
+            duration: Appearance.animation.slow
         }
 
     }

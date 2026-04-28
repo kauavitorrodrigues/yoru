@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import Quickshell.Widgets
 import qs.services
+import "../common"
 
 Button {
 
@@ -12,7 +13,7 @@ Button {
     property var appToplevel
     property var appListRoot
     property int lastFocused: -1
-    property real iconSize: 30
+    property real iconSize: Appearance.sizing.dock.iconSize
     property real countDotWidth: 10
     property real countDotHeight: 4
     property var desktopEntry: appToplevel ? DesktopEntries.heuristicLookup(appToplevel.appId) : null
@@ -26,12 +27,12 @@ Button {
         width: root.iconSize * 1.25
         height: root.iconSize * 1.25
         anchors.centerIn: parent
-        color: Qt.rgba(0.9, 0.87, 0.93, 0.45)
-        radius: 10
+        color: Appearance.colors.hoverStrong
+        radius: 13
         opacity: 0
 
         Behavior on opacity {
-            NumberAnimation { duration: 200; easing.type: Easing.InOutQuad }
+            NumberAnimation { duration: Appearance.animation.normal; easing.type: Appearance.animationCurves.inOutQuad }
         }
     }
         
@@ -105,10 +106,10 @@ Button {
             model: Math.min(root.appToplevel?.toplevels?.length || 0, 3)
             delegate: Rectangle {
                 radius: 999
-                implicitWidth: root.countDotHeight
+                implicitWidth: root.countDotHeight + 1
                 implicitHeight: root.countDotHeight
                 color: (root.appToplevel?.toplevels?.some(t => t.activated) || false)
-                    ? Qt.rgba(1, 1, 1, 0.78) : Qt.rgba(1, 1, 1, 0.41)
+                    ? Appearance.colors.indicatorActive : Appearance.colors.indicatorInactive
             }
         }
     }

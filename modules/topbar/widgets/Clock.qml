@@ -1,11 +1,12 @@
 import ".."
 import Quickshell
+import "../../common"
 
 TopBarWidget {
     id: root
 
     label: Qt.formatDateTime(clock.date, "hh:mm")
-    labelColor: '#ffffff'
+    labelColor: Appearance.colors.textPrimary
     hPadding: 30
 
     SystemClock {

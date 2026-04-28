@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import qs.services
+import "../../common"
 
 Button {
     id: root
@@ -19,12 +20,12 @@ Button {
     }
 
     background: Rectangle {
-        color: root.hovered ? Qt.rgba(0.32, 0.32, 0.32, 0.75) : Qt.rgba(0.24, 0.24, 0.24, 0.75)
+        color: root.hovered ? Appearance.colors.hoverStrong : Appearance.colors.hoverSoft
         radius: 5
 
         Behavior on color {
             ColorAnimation {
-                duration: 120
+                duration: Appearance.animation.fast
             }
 
         }
@@ -33,15 +34,16 @@ Button {
 
     Behavior on opacity {
         NumberAnimation {
-            duration: 80
+            duration: Appearance.animation.instant
         }
 
     }
 
     contentItem: Text {
         text: root.iconName
+        font.family: Appearance.fonts.primary
         font.pixelSize: root.iconSize
-        color: root.enabled ? "white" : Qt.rgba(1, 1, 1, 0.3)
+        color: root.enabled ? Appearance.colors.textPrimary : Appearance.colors.textDisabled
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
     }

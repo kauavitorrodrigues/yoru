@@ -1,12 +1,13 @@
 import ".."
 import QtQuick
 import Quickshell.Io
+import "../../common"
 
 TopBarWidget {
     id: root
 
     icon: "󰈀"
-    iconColor: connected ? '#ffffff' : "#FF8080"
+    iconColor: connected ? Appearance.colors.textPrimary : Appearance.colors.stateDanger
     label: connected ? "Connected" : "Not connected"
 
     property bool connected: false

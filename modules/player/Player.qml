@@ -3,6 +3,7 @@ import "track"
 import Quickshell
 import qs.services
 import qs.modules.common.functions
+import "../common"
 
 Loader {
     id: root
@@ -53,16 +54,16 @@ Loader {
                 target: player
                 property: "opacity"
                 to: 1
-                duration: 200
-                easing.type: Easing.OutCubic
+                duration: Appearance.animation.normal
+                easing.type: Appearance.animationCurves.outCubic
             }
 
             NumberAnimation {
                 target: playerSlide
                 property: "y"
                 to: 0
-                duration: 200
-                easing.type: Easing.OutCubic
+                duration: Appearance.animation.normal
+                easing.type: Appearance.animationCurves.outCubic
             }
 
         }
@@ -74,16 +75,16 @@ Loader {
                 target: player
                 property: "opacity"
                 to: 0
-                duration: 200
-                easing.type: Easing.InCubic
+                duration: Appearance.animation.normal
+                easing.type: Appearance.animationCurves.inCubic
             }
 
             NumberAnimation {
                 target: playerSlide
                 property: "y"
                 to: -6
-                duration: 200
-                easing.type: Easing.InCubic
+                duration: Appearance.animation.normal
+                easing.type: Appearance.animationCurves.inCubic
             }
 
         }
@@ -92,8 +93,8 @@ Loader {
             id: playerBackground
 
             anchors.fill: parent
-            color: Qt.rgba(0.08, 0.07, 0.07)
-            radius: 15
+            color: Appearance.colors.shellSurface
+            radius: Appearance.sizing.topbar.cardRadius
         }
 
         MouseArea {

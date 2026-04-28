@@ -2,6 +2,7 @@ import QtQuick
 import ".."
 import Quickshell.Io
 import Quickshell.Services.Pipewire
+import "../../common"
 
 Item {
     id: root
@@ -30,7 +31,7 @@ Item {
         id: widget
         anchors.fill: parent
         icon: root.volIcon
-        iconColor: root.muted ? '#ffffff' : '#ffffff'
+        iconColor: Appearance.colors.textPrimary
         label: root.muted ? "" : root.volumePct + "%"
     }
 

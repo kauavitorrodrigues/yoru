@@ -1,11 +1,12 @@
 import QtQuick
 import QtQuick.Controls
+import "../../common"
 
 Item {
     id: root
 
     property var amplitudes: []
-    property color barColor: '#ffffff'
+    property color barColor: Appearance.colors.textPrimary
     property int maxBarHeight: 20
     property int barWidth: 3
     property int spacing: 2

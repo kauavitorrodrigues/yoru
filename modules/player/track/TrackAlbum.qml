@@ -1,5 +1,6 @@
 import QtQuick
 import qs.services
+import "../../common"
 
 Item {
     id: root
@@ -60,8 +61,8 @@ Item {
                 target: imgB
                 property: "opacity"
                 to: 1
-                duration: 300
-                easing.type: Easing.InOutQuad
+                duration: Appearance.animation.medium
+                easing.type: Appearance.animationCurves.inOutQuad
             }
 
             ScriptAction {

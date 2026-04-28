@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
+import "../common"
 
 // Scope
 Scope {
@@ -20,10 +21,10 @@ Scope {
 
             color: "transparent"
 
-            implicitHeight: 55
+            implicitHeight: Appearance.sizing.dock.panelHeight
             implicitWidth: dockBackground.implicitWidth
 
-            margins.bottom: 8
+            margins.bottom: Appearance.sizing.dock.bottomMargin
             WlrLayershell.namespace: "quickshell:dock"
 
             anchors {
@@ -76,22 +77,21 @@ Scope {
                             anchors.fill: parent
                             anchors.topMargin: 0
                             anchors.bottomMargin: 0
-                            color: Qt.rgba(0.08, 0.07, 0.07)
-                            border.width: 1
-                            border.color: "transparent"
-                            radius: 13
+                            color: Appearance.colors.shellSurface
+                            radius: Appearance.sizing.dock.radius
                         }
 
                         RowLayout {
                             id: dockRow
 
-                            property real padding: 10
+                            property real padding: Appearance.sizing.dock.padding
 
                             anchors {
                                 fill: parent
                                 leftMargin: padding
                                 rightMargin: padding
-                                bottomMargin: 2
+                                topMargin: 1
+                                bottomMargin: 4
                             }
 
                             DockApps {

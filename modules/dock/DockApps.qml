@@ -5,6 +5,7 @@ import Quickshell.Widgets
 import QtQuick.Controls
 import Quickshell.Wayland
 import qs.services
+import "../common"
 
 Item {
 
@@ -26,7 +27,7 @@ Item {
     ListView {
 
         id: list
-        spacing: 14
+        spacing: Appearance.sizing.dock.listSpacing
         orientation: ListView.Horizontal
         implicitWidth: contentWidth
 
@@ -144,8 +145,8 @@ Item {
                 visible: opacity > 0
 
                 clip: true
-                color: Qt.rgba(0.08, 0.07, 0.07)
-                radius: 10
+                color: Appearance.colors.shellSurfaceElevated
+                radius: Appearance.sizing.dock.previewRadius
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: 5
                 anchors.horizontalCenter: parent.horizontalCenter

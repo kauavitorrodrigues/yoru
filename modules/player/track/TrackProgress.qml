@@ -1,6 +1,7 @@
 import QtQuick
 import qs.services
 import qs.modules.common.functions
+import "../../common"
 
 Item {
     id: root
@@ -29,8 +30,9 @@ Item {
             verticalCenter: bar.verticalCenter
         }
         text: DateUtils.formatTime(PlayerService.activePlayer?.position ?? 0)
-        color: "white"
-        font.pixelSize: 12
+        color: Appearance.colors.textPrimary
+        font.family: Appearance.fonts.primary
+        font.pixelSize: Appearance.fonts.sizes.sm
         font.bold: true
     }
 
@@ -47,7 +49,7 @@ Item {
 
         Rectangle {
             anchors.fill: parent
-            color: Qt.rgba(1, 1, 1, 0.15)
+            color: Appearance.colors.hoverSoft
             radius: 2
         }
 
@@ -58,11 +60,11 @@ Item {
 
             width: len > 0 ? parent.width * (pos / len) : 0
             height: parent.height
-            color: "white"
+            color: Appearance.colors.textPrimary
             radius: 2
 
             Behavior on width {
-                NumberAnimation { duration: 900; easing.type: Easing.Linear }
+                NumberAnimation { duration: Appearance.animation.playerProgress; easing.type: Appearance.animationCurves.linear }
             }
         }
     }
@@ -73,8 +75,9 @@ Item {
             verticalCenter: bar.verticalCenter
         }
         text: DateUtils.formatTime(PlayerService.activePlayer?.length ?? 0)
-        color: Qt.rgba(1, 1, 1, 0.5)
-        font.pixelSize: 12
+        color: Appearance.colors.indicatorInactive
+        font.family: Appearance.fonts.primary
+        font.pixelSize: Appearance.fonts.sizes.sm
         font.bold: true
     }
 

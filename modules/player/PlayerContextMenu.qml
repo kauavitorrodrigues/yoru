@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import qs.services
 import "track"
+import "../common"
 
 PopupWindow {
     id: root
@@ -43,8 +44,8 @@ PopupWindow {
         id: panel
 
         anchors.fill: parent
-        color: Qt.rgba(0.08, 0.07, 0.07)
-        radius: 15
+        color: Appearance.colors.shellSurface
+        radius: Appearance.sizing.topbar.cardRadius
         opacity: 0
 
         ParallelAnimation {
@@ -54,16 +55,16 @@ PopupWindow {
                 target: panel
                 property: "opacity"
                 to: 1
-                duration: 200
-                easing.type: Easing.OutCubic
+                duration: Appearance.animation.normal
+                easing.type: Appearance.animationCurves.outCubic
             }
 
             NumberAnimation {
                 target: panelSlide
                 property: "y"
                 to: 0
-                duration: 200
-                easing.type: Easing.OutCubic
+                duration: Appearance.animation.normal
+                easing.type: Appearance.animationCurves.outCubic
             }
 
         }
@@ -75,16 +76,16 @@ PopupWindow {
                 target: panel
                 property: "opacity"
                 to: 0
-                duration: 150
-                easing.type: Easing.InCubic
+                duration: Appearance.animation.fast
+                easing.type: Appearance.animationCurves.inCubic
             }
 
             NumberAnimation {
                 target: panelSlide
                 property: "y"
                 to: -8
-                duration: 150
-                easing.type: Easing.InCubic
+                duration: Appearance.animation.fast
+                easing.type: Appearance.animationCurves.inCubic
             }
 
         }
