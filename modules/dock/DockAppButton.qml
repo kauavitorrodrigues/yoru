@@ -95,11 +95,20 @@ Button {
         id: hoverArea
         anchors.fill: parent
         hoverEnabled: true
-        acceptedButtons: Qt.MiddleButton
+        acceptedButtons: Qt.MiddleButton | Qt.RightButton
 
         onPressed: function(event) {
-            root.desktopEntry?.execute();
-            event.accepted = true;
+            if (event.button === Qt.MiddleButton) {
+                root.desktopEntry?.execute();
+                event.accepted = true;
+                return;
+            }
+
+            if (event.button === Qt.RightButton) {
+                TaskbarApps.togglePin(root.appToplevel?.appId);
+                event.accepted = true;
+                return;
+            }
         }
         
         onEntered: {

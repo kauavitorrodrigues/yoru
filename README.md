@@ -33,6 +33,7 @@ yoru/
 │   ├── player/         # Music player widget
 │   └── common/         # Shared utilities and algorithms
 └── services/           # Singleton state managers
+    ├── Settings.qml       # Persistent shell options (dock pins, future global settings)
     ├── PlayerService.qml   # MPRIS media state + CAVA integration
     ├── AppSearch.qml       # App discovery and icon resolution
     └── TaskbarApps.qml     # Open window tracking
@@ -44,7 +45,7 @@ yoru/
 System panel with workspace switcher, clock, RAM usage, network status, and volume control. Volume adjusts with the scroll wheel; left-click opens pavucontrol, right-click opens pw-top.
 
 **Application Dock**
-Shows all open applications with window count indicator dots. Left-click cycles through windows; middle-click launches a new instance.
+Shows pinned and open applications with window count indicator dots for running windows only. Left-click cycles through windows (or launches when not running), middle-click launches a new instance, and right-click toggles pin/unpin. Pinned apps persist across restarts via `~/.config/yoru/settings.json`.
 
 **Music Player**
 MPRIS-based player widget for Spotify with album art, scrolling track info, playback controls, a progress bar, and a live audio waveform powered by [CAVA](https://github.com/karlstav/cava).
@@ -75,6 +76,7 @@ The script will:
 4. Add a WirePlumber rule that automatically routes Spotify to that sink on launch
 5. Copy the CAVA config to `~/.config/cava/configs/yoru.conf`
 6. Symlink the repo to `~/.config/quickshell/yoru`
+7. Create `~/.config/yoru/settings.json` for persistent shell settings (including dock pinned apps)
 
 Then start Yoru:
 
@@ -134,7 +136,8 @@ The install script handles all of these automatically on Arch.
 |---------|-------------|
 | `PlayerService.qml` | Tracks MPRIS state (title, artist, art, play state), runs CAVA subprocess for waveform data at ~60fps |
 | `AppSearch.qml` | Fuzzy app search with multi-step icon guessing fallback |
-| `TaskbarApps.qml` | Maintains a live map of open windows grouped by app ID |
+| `Settings.qml` | Centralized persistent shell settings used by services/modules |
+| `TaskbarApps.qml` | Maintains a merged map of pinned + open apps grouped by app ID |
 
 ## Copying
 

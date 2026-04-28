@@ -7,6 +7,8 @@ set -euo pipefail
 
 YORU_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 QS_DIR="$HOME/.config/quickshell/yoru"
+YORU_CONF_DIR="$HOME/.config/yoru"
+YORU_SETTINGS_FILE="$YORU_CONF_DIR/settings.json"
 CAVA_CONF="$HOME/.config/cava/configs/yoru.conf"
 PW_CONF_DIR="$HOME/.config/pipewire/pipewire.conf.d"
 WP_CONF_DIR="$HOME/.config/wireplumber/wireplumber.conf.d"
@@ -176,6 +178,25 @@ setup_shell() {
     ok "Linked $YORU_DIR → $QS_DIR"
 }
 
+# ── yoru settings ─────────────────────────────────────────────────────────────
+setup_settings() {
+    step "Preparing Yoru settings storage"
+    mkdir -p "$YORU_CONF_DIR"
+
+    if [[ ! -f "$YORU_SETTINGS_FILE" ]]; then
+        cat > "$YORU_SETTINGS_FILE" <<'EOF'
+{
+    "dock": {
+        "pinnedApps": []
+    }
+}
+EOF
+        ok "Created settings file → $YORU_SETTINGS_FILE"
+    else
+        ok "Settings file already exists → $YORU_SETTINGS_FILE"
+    fi
+}
+
 # ── run ───────────────────────────────────────────────────────────────────────
 echo -e "\n${GREEN}Yoru installer${NC}"
 echo "────────────────────────────────────────"
@@ -187,6 +208,7 @@ setup_routing
 restart_audio
 setup_cava
 setup_shell
+setup_settings
 
 echo -e "\n${GREEN}────────────────────────────────────────${NC}"
 echo -e "${GREEN}  Done!${NC}  Start Yoru with:\n"
@@ -196,3 +218,4 @@ echo -e "    exec-once = quickshell -p \"$QS_DIR\"\n"
 echo -e "  NOTE: Open Spotify, then check Sound settings (pavucontrol)"
 echo -e "  and make sure its output is set to 'Yoru Spotify Sink'."
 echo -e "  WirePlumber should do this automatically on next Spotify launch.\n"
+echo -e "  Dock pins are persisted in: $YORU_SETTINGS_FILE\n"
