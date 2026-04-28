@@ -21,6 +21,26 @@ Button {
     implicitWidth: iconSize
     implicitHeight: iconSize
     padding: 0
+    scale: hoverArea.containsMouse ? 1.08 : 1
+
+    transform: Translate {
+        id: hoverLift
+        y: hoverArea.containsMouse ? -4 : 0
+
+        Behavior on y {
+            NumberAnimation {
+                duration: Appearance.animation.fast
+                easing.type: Appearance.animationCurves.outCubic
+            }
+        }
+    }
+
+    Behavior on scale {
+        NumberAnimation {
+            duration: Appearance.animation.fast
+            easing.type: Appearance.animationCurves.inOutQuad
+        }
+    }
 
     Rectangle {
         id: hoverBg
@@ -72,6 +92,7 @@ Button {
     }
 
     MouseArea {
+        id: hoverArea
         anchors.fill: parent
         hoverEnabled: true
         acceptedButtons: Qt.MiddleButton
@@ -82,7 +103,7 @@ Button {
         }
         
         onEntered: {
-            hoverBg.opacity = 0.3
+            hoverBg.opacity = 1
             root.appListRoot.lastHoveredButton = root
             root.appListRoot.buttonHovered = true
         }
