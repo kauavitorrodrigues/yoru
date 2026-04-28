@@ -136,6 +136,13 @@ Item {
                 return itemCenter.x - width / 2
             }
 
+            Behavior on x {
+                NumberAnimation {
+                    duration: Appearance.animation.fast
+                    easing.type: Appearance.animationCurves.outCubic
+                }
+            }
+
             Rectangle {
 
                 id: popupBackground
@@ -152,6 +159,24 @@ Item {
                 anchors.horizontalCenter: parent.horizontalCenter
                 implicitHeight: previewRowLayout.implicitHeight + padding * 2
                 implicitWidth: previewRowLayout.implicitWidth + padding * 2
+                transform: Translate {
+                    id: previewSlide
+                    y: previewPopup.show ? 0 : 10
+
+                    Behavior on y {
+                        NumberAnimation {
+                            duration: Appearance.animation.normal
+                            easing.type: Appearance.animationCurves.outCubic
+                        }
+                    }
+                }
+
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: Appearance.animation.normal
+                        easing.type: Appearance.animationCurves.outCubic
+                    }
+                }
 
                 RowLayout {
 
