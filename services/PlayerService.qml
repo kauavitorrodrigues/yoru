@@ -15,6 +15,16 @@ Singleton {
     property string album: ""
     property string artUrl: ""
     property bool isPlaying: false
+    
+    readonly property bool hasAudioContext: {
+        if (!isPlaying) return false;
+
+        const amps = amplitudes ?? [];
+        for (let i = 0; i < amps.length; i++) {
+            if ((amps[i] ?? 0) > 0.01) return true;
+        }
+        return false;
+    }
 
     property var amplitudes: new Array(20).fill(0)
     property bool _hasPending: false

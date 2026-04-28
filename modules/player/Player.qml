@@ -123,9 +123,36 @@ Loader {
                 anchors.verticalCenter: parent.verticalCenter
             }
 
-            WaveForm {
+            Item {
+                id: waveSlot
+
                 anchors.verticalCenter: parent.verticalCenter
-                amplitudes: PlayerService.amplitudes
+                implicitWidth: PlayerService.hasAudioContext ? waveForm.width : 0
+                implicitHeight: waveForm.height
+                opacity: PlayerService.hasAudioContext ? 1 : 0
+                clip: true
+
+                Behavior on implicitWidth {
+                    NumberAnimation {
+                        duration: Appearance.animation.normal
+                        easing.type: Appearance.animationCurves.outCubic
+                    }
+                }
+
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: Appearance.animation.normal
+                        easing.type: Appearance.animationCurves.outCubic
+                    }
+                }
+
+                WaveForm {
+                    id: waveForm
+
+                    anchors.verticalCenter: parent.verticalCenter
+                    amplitudes: PlayerService.amplitudes
+                }
+
             }
 
         }
