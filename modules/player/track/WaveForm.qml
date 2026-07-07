@@ -22,9 +22,10 @@ Item {
 
         Rectangle {
             width: root.barWidth
-            height: root.amplitudes[index] * root.maxBarHeight
+            height: Math.max(root.barWidth, root.amplitudes[index] * root.maxBarHeight)
+            radius: root.barWidth / 2
             color: root.barColor
-            anchors.bottom: parent.bottom
+            anchors.verticalCenter: parent.verticalCenter
             x: index * (root.barWidth + root.spacing)
         }
 
