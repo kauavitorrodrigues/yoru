@@ -27,10 +27,13 @@ Yoru is a custom desktop shell for [Hyprland](https://hyprland.org/), built enti
 ```
 yoru/
 ├── shell.qml           # Main entry point
+├── controllers/        # IPC-facing controllers (bridge daemon events to state)
+│   └── SpeechController.qml
 ├── modules/            # UI components
 │   ├── topbar/         # Top system bar and widgets
 │   ├── dock/           # Application dock
 │   ├── player/         # Music player widget
+│   ├── speech/         # Voice dictation UI (optional, see below)
 │   └── common/         # Shared utilities and algorithms
 └── services/           # Singleton state managers
     ├── Settings.qml       # Persistent shell options (dock pins, future global settings)
@@ -55,6 +58,9 @@ Fuzzy application search using FuzzySort with a smart icon resolution fallback c
 
 **Workspace Switching**
 Hyprland workspace integration with numbered buttons (1–9) dispatched over IPC.
+
+**Voice Dictation** *(optional)*
+Live speech-to-text preview while recording, shown as a floating pill under the top bar, plus a waveform indicator that replaces the clock while active. Fully opt-in — see [Voice Dictation](#voice-dictation-optional) below.
 
 ## Installation
 
@@ -101,6 +107,27 @@ If something doesn't work:
 
 > WirePlumber 0.5+ is required for the automatic routing rule. Older setups will need the manual `pavucontrol` step.
 
+### Voice Dictation (optional)
+
+Yoru can show a live speech-to-text preview while recording, backed by [yoru-speech](https://github.com/kauavitorrodrigues/yoru-speech), a separate offline dictation daemon. This integration is **disabled by default** and has zero footprint until turned on — no IPC connection, no daemon-facing subprocess, nothing — because both the daemon bridge (`SpeechController`) and the transcript pill (`TranscriptOverlay`) are only ever instantiated behind the flag below. (The waveform indicator itself always exists in the top bar per Yoru's crossfade pattern — Clock and indicator are both mounted so they can fade between each other — but it just sits invisible and idle with no daemon connected.)
+
+To enable it:
+
+1. Install and run `yoru-speech` separately (see its own repo for setup — model selection, language, and everything else specific to transcription lives in *its* config, not Yoru's).
+2. Add a `speech` block to `~/.config/yoru/settings.json`:
+
+   ```json
+   "speech": {
+       "enabled": true,
+       "socketPath": ""
+   }
+   ```
+
+   - `enabled` — turns the whole integration on/off: the IPC connection to `yoru-speech` and the transcript pill only exist while this is `true`.
+   - `socketPath` — path to the daemon's IPC socket. Leave empty to auto-detect at `$XDG_RUNTIME_DIR/yoru-speech.sock`; only set this if you've configured `yoru-speech` to use a custom path.
+
+There is no in-app settings screen for this on purpose — it's a small, optional flag for people who happen to run the daemon, not a feature meant to require configuration UI of its own.
+
 ## Dependencies
 
 The install script handles all of these automatically on Arch.
@@ -128,6 +155,7 @@ The install script handles all of these automatically on Arch.
 | `modules/topbar/` | Top bar container and all system widgets |
 | `modules/dock/` | Dock with open app list and per-app buttons |
 | `modules/player/` | Full player UI — album, info, controls, waveform |
+| `modules/speech/` | Voice dictation UI — waveform indicator and live transcript pill (optional, see [Voice Dictation](#voice-dictation-optional)) |
 | `modules/common/` | FuzzySort and Levenshtein distance algorithms, date utilities |
 
 ### Services
@@ -138,6 +166,12 @@ The install script handles all of these automatically on Arch.
 | `AppSearch.qml` | Fuzzy app search with multi-step icon guessing fallback |
 | `Settings.qml` | Centralized persistent shell settings used by services/modules |
 | `TaskbarApps.qml` | Maintains a merged map of pinned + open apps grouped by app ID |
+
+### Controllers
+
+| Controller | Description |
+|------------|-------------|
+| `SpeechController.qml` | Bridges `yoru-speech` IPC events into `SpeechState` (see [Voice Dictation](#voice-dictation-optional)); only instantiated when `speech.enabled` is `true` |
 
 ## Copying
 
