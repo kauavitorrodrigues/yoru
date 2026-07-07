@@ -55,7 +55,7 @@ System panel with workspace switcher, clock, RAM usage, network status, and volu
 Shows pinned and open applications with window count indicator dots for running windows only. Left-click cycles through windows (or launches when not running), middle-click launches a new instance, and right-click toggles pin/unpin. Pinned apps persist across restarts via `~/.config/yoru/settings.json`.
 
 **Music Player**
-MPRIS-based player widget for Spotify with album art, scrolling track info, playback controls, a progress bar, and a live audio waveform powered by [CAVA](https://github.com/karlstav/cava).
+MPRIS-based player widget for Spotify with album art, scrolling track info, playback controls, a progress bar, and a live audio waveform powered by [CAVA](https://github.com/karlstav/cava). Ships in two variants — a `full` layout (album art, stacked title/artist) and a `minimal` one (Spotify icon, single-line title + artist) — configurable via `~/.config/yoru/settings.json`; see [Player Widget Variant](#player-widget-variant) below.
 
 **App Search**
 Fuzzy application search using FuzzySort with a smart icon resolution fallback chain — handles mismatched app IDs, Steam games, and more.
@@ -110,6 +110,21 @@ If something doesn't work:
 - **Waveform works but no sound** — the loopback may not have linked correctly. Re-run `./install.sh` and restart Spotify.
 
 > WirePlumber 0.5+ is required for the automatic routing rule. Older setups will need the manual `pavucontrol` step.
+
+### Player Widget Variant
+
+The player widget supports two layouts, controlled by `player.widgetVariant` in `~/.config/yoru/settings.json`:
+
+```json
+"player": {
+    "widgetVariant": "minimal"
+}
+```
+
+- `"full"` *(default)* — album art, stacked title/artist, and the waveform.
+- `"minimal"` — a Spotify icon in place of the album art, title and artist on a single line, and a shorter waveform to match.
+
+There is no in-app settings screen for this either — it's a single JSON field, same philosophy as the Voice Dictation flag below.
 
 ### Voice Dictation (optional)
 
