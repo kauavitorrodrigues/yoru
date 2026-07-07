@@ -6,15 +6,28 @@ Item {
     id: root
 
     property real size: 30
+    property bool minimal: false
 
     implicitWidth: size
     implicitHeight: size
+
+    Text {
+        anchors.fill: parent
+        visible: root.minimal
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
+        text: ""
+        font.family: Appearance.fonts.primary
+        font.pixelSize: root.size * 0.55
+        color: "#1DB954"
+    }
 
     Rectangle {
         anchors.fill: parent
         radius: 5
         clip: true
         color: "transparent"
+        visible: !root.minimal
 
         Image {
             id: imgA

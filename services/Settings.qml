@@ -15,6 +15,7 @@ Singleton {
     property alias dock: settingsJsonAdapter.dock
     property alias topbar: settingsJsonAdapter.topbar
     property alias speech: settingsJsonAdapter.speech
+    property alias player: settingsJsonAdapter.player
 
     function setDockPinnedApps(appIds) {
         settingsJsonAdapter.dock.pinnedApps = appIds;
@@ -67,6 +68,10 @@ Singleton {
             property JsonObject speech: JsonObject {
                 property bool enabled: false
                 property string socketPath: ""
+            }
+
+            property JsonObject player: JsonObject {
+                property string widgetVariant: "full"
             }
         }
     }
