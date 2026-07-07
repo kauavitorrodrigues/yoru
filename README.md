@@ -20,6 +20,10 @@ Yoru is a custom desktop shell for [Hyprland](https://hyprland.org/), built enti
 |:---:|:---:|
 | <img src="assets/screenshots/overview.png" alt="Overview" /> | <img src="assets/screenshots/player.png" alt="Player" /> |
 
+| Voice dictation |
+|:---:|
+| <img src="assets/screenshots/transcription.png" alt="Voice dictation" /> |
+
 </div>
 
 ## Repository Structure
