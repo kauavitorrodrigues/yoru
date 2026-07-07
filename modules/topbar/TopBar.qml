@@ -1,11 +1,12 @@
 import "../player"
 import "./widgets"
+import "../speech/qml"
+import "../speech/state"
+import "../common"
+import qs.services
 import QtQuick
-import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
-import Quickshell.Io
-import Quickshell.Wayland
 
 PanelWindow {
     id: root
@@ -49,7 +50,38 @@ PanelWindow {
         }
 
         // Center
-        Clock { anchors.centerIn: parent }
+        Item {
+            id: centerSection
+            anchors.centerIn: parent
+            implicitWidth: Math.max(clock.implicitWidth, speechIndicator.implicitWidth)
+            implicitHeight: Math.max(clock.implicitHeight, speechIndicator.implicitHeight)
+
+            Clock {
+                id: clock
+                anchors.centerIn: parent
+                opacity: SpeechState.state !== "recording" ? 1 : 0
+
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: Appearance.animation.medium
+                        easing.type: Appearance.animationCurves.inOutQuad
+                    }
+                }
+            }
+
+            SpeechIndicator {
+                id: speechIndicator
+                anchors.centerIn: parent
+                opacity: SpeechState.state === "recording" ? 1 : 0
+
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: Appearance.animation.medium
+                        easing.type: Appearance.animationCurves.inOutQuad
+                    }
+                }
+            }
+        }
 
         // Right
         RowLayout {
@@ -63,6 +95,14 @@ PanelWindow {
             Memory {}
             Network {}
             Volume {}
+        }
+    }
+
+    LazyLoader {
+        active: Settings.speech.enabled
+        component: TranscriptOverlay {
+            anchorWindow: root
+            maxWidth: speechIndicator.implicitWidth * 1.75
         }
     }
 }
