@@ -2,6 +2,8 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
+import qs.services
+import "../player"
 import "../common"
 
 // Scope
@@ -38,7 +40,7 @@ Scope {
             }
 
             MouseArea {
-                
+
                 id: dockMouseArea
                 height: parent.height
 
@@ -86,6 +88,8 @@ Scope {
 
                             property real padding: Appearance.sizing.dock.padding
 
+                            readonly property var items: Settings.layout.dock.items
+
                             anchors {
                                 fill: parent
                                 leftMargin: padding
@@ -94,9 +98,38 @@ Scope {
                                 bottomMargin: 4
                             }
 
-                            DockApps {
-                                id: dockApps
-                                buttonPadding: dockRow.padding
+                            Component {
+                                id: dockAppsComponent
+                                DockApps {
+                                    buttonPadding: dockRow.padding
+                                }
+                            }
+
+                            Component {
+                                id: dockPlayerComponent
+                                Player {}
+                            }
+
+                            Repeater {
+                                model: dockRow.items
+
+                                delegate: Loader {
+                                    required property string modelData
+
+                                    Layout.fillHeight: modelData !== "player"
+                                    Layout.alignment: modelData === "player" ? Qt.AlignVCenter : 0
+
+                                    sourceComponent: {
+                                        switch (modelData) {
+                                        case "apps":
+                                            return dockAppsComponent;
+                                        case "player":
+                                            return dockPlayerComponent;
+                                        default:
+                                            return null;
+                                        }
+                                    }
+                                }
                             }
 
                         }
