@@ -45,7 +45,7 @@ install_deps() {
     fi
 
     # pacman packages
-    local pacman_pkgs=(pipewire wireplumber pipewire-pulse cava)
+    local pacman_pkgs=(pipewire wireplumber pipewire-pulse cava python python-pillow)
     local to_install=()
     for pkg in "${pacman_pkgs[@]}"; do
         if pacman -Q "$pkg" &>/dev/null; then
