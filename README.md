@@ -38,6 +38,7 @@ yoru/
 │   ├── dock/           # Application dock
 │   ├── player/         # Music player widget
 │   ├── speech/         # Voice dictation UI (optional, see below)
+│   ├── wallpaper/      # Wallpaper picker overlay (optional, see below)
 │   └── common/         # Shared utilities and algorithms
 └── services/           # Singleton state managers
     ├── Settings.qml       # Persistent shell options (dock pins, future global settings)
@@ -65,6 +66,9 @@ Hyprland workspace integration with numbered buttons (1–9) dispatched over IPC
 
 **Voice Dictation** *(optional)*
 Live speech-to-text preview while recording, shown as a floating pill under the top bar, plus a waveform indicator that replaces the clock while active. Fully opt-in — see [Voice Dictation](#voice-dictation-optional) below.
+
+**Wallpaper Picker** *(optional)*
+A keyboard-driven overlay for browsing and applying wallpapers, with cached thumbnails generated in the background. Toggled via a keybind instead of always visible. Fully opt-in — see [Wallpaper Picker](#wallpaper-picker-optional) below.
 
 ## Installation
 
@@ -147,6 +151,35 @@ To enable it:
 
 There is no in-app settings screen for this on purpose — it's a small, optional flag for people who happen to run the daemon, not a feature meant to require configuration UI of its own.
 
+### Wallpaper Picker (optional)
+
+Yoru can show a keyboard-driven wallpaper picker overlay, backed by [awww](https://codeberg.org/LGFae/awww) for applying the selection. This integration is **disabled by default** and has zero footprint until turned on — the overlay and its IPC toggle handler are only ever instantiated behind the flag below.
+
+To enable it:
+
+1. Install and run `awww-daemon` separately (already handled by `exec-once = awww-daemon` if you're on this machine's Hyprland config).
+2. Add a `wallpaper` block to `~/.config/yoru/settings.json`:
+
+   ```json
+   "wallpaper": {
+       "enabled": true,
+       "directory": "",
+       "cacheDir": ""
+   }
+   ```
+
+   - `enabled` — turns the whole integration on/off: the overlay and the IPC toggle only exist while this is `true`.
+   - `directory` — folder to scan for wallpapers. Leave empty to default to `~/Pictures/Wallpapers`.
+   - `cacheDir` — folder to store generated thumbnails. Leave empty to default to `$XDG_CACHE_HOME/yoru/wallpaper-thumbnails` (or `~/.cache/yoru/wallpaper-thumbnails`).
+
+3. Bind a key to toggle it in `hyprland.conf`:
+
+   ```ini
+   bind = $mainMod, W, exec, qs -p ~/.config/quickshell/yoru ipc call wallpaper toggle
+   ```
+
+Navigate with Tab / Shift+Tab / arrow keys, apply with Enter/Return, close with Escape.
+
 ## Dependencies
 
 The install script handles all of these automatically on Arch.
@@ -158,12 +191,15 @@ The install script handles all of these automatically on Arch.
 | `wireplumber` | pacman | PipeWire session manager |
 | `pipewire-pulse` | pacman | PulseAudio compatibility layer |
 | `cava` | pacman | Audio visualizer (waveform) |
+| `python` | pacman | Wallpaper scan/thumbnail scripts (optional feature) |
+| `python-pillow` | pacman | Wallpaper thumbnail generation (optional feature) |
 
 **Also required (install manually):**
 - [Hyprland](https://hyprland.org/) — Wayland compositor
 - `pavucontrol` — volume control GUI
 - `foot` — terminal (used for pw-top shortcut)
 - JetBrainsMono Nerd Font
+- [awww](https://codeberg.org/LGFae/awww) — wallpaper daemon (only needed for the optional [Wallpaper Picker](#wallpaper-picker-optional))
 
 ## Structure Details
 
@@ -175,6 +211,7 @@ The install script handles all of these automatically on Arch.
 | `modules/dock/` | Dock with open app list and per-app buttons |
 | `modules/player/` | Full player UI — album, info, controls, waveform |
 | `modules/speech/` | Voice dictation UI — waveform indicator and live transcript pill (optional, see [Voice Dictation](#voice-dictation-optional)) |
+| `modules/wallpaper/` | Wallpaper picker overlay — carousel, thumbnail scripts, and visibility state (optional, see [Wallpaper Picker](#wallpaper-picker-optional)) |
 | `modules/common/` | FuzzySort and Levenshtein distance algorithms, date utilities |
 
 ### Services
@@ -191,6 +228,7 @@ The install script handles all of these automatically on Arch.
 | Controller | Description |
 |------------|-------------|
 | `SpeechController.qml` | Bridges `yoru-speech` IPC events into `SpeechState` (see [Voice Dictation](#voice-dictation-optional)); only instantiated when `speech.enabled` is `true` |
+| `WallpaperController.qml` | Exposes a Quickshell `IpcHandler` (`qs ipc call wallpaper toggle`) that flips `WallpaperState.visible` (see [Wallpaper Picker](#wallpaper-picker-optional)); only instantiated when `wallpaper.enabled` is `true` |
 
 ## Copying
 
