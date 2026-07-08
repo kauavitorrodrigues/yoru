@@ -18,7 +18,7 @@ Item {
         verticalAlignment: Text.AlignVCenter
         text: ""
         font.family: Appearance.fonts.primary
-        font.pixelSize: root.size * 0.55
+        font.pixelSize: 16
         color: "#1DB954"
     }
 

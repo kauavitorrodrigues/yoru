@@ -119,6 +119,7 @@ Loader {
             TrackAlbum {
                 anchors.verticalCenter: parent.verticalCenter
                 minimal: player.minimal
+                size: player.minimal ? 19 : 30
             }
 
             TrackInfo {
