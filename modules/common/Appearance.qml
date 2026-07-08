@@ -57,6 +57,9 @@ Singleton {
 
         property color indicatorActive: Qt.rgba(1, 1, 1, 0.9)
         property color indicatorInactive: Qt.rgba(1, 1, 1, 0.45)
+
+        property color cardPlaceholder: Qt.rgba(1, 1, 1, 0.08)
+        property color scrim: Qt.rgba(0, 0, 0, 0.4)
     }
 
     sizing: QtObject {
@@ -73,6 +76,14 @@ Singleton {
             property int cardRadius: 15
             property int workspaceButtonFocusedSize: 13
             property int workspaceButtonIdleSize: 8
+        }
+        property QtObject wallpaper: QtObject {
+            property int overlayWidth: 1000
+            property int overlayHeight: 550
+            property int overlayRadius: 15
+            property int itemWidth: 200
+            property int itemHeight: 500
+            property int itemRadius: 12
         }
     }
 }
