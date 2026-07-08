@@ -6,6 +6,7 @@ Item {
     id: root
 
     property bool minimal: false
+    property bool showArtist: true
 
     implicitWidth: minimal ? rowLayout.implicitWidth : columnLayout.implicitWidth
     implicitHeight: minimal ? rowLayout.implicitHeight : columnLayout.implicitHeight
@@ -40,10 +41,11 @@ Item {
             text: PlayerService.title || "Unknown Title"
             color: Appearance.colors.textPrimary
             fontBold: true
-            maxWidth: 120
+            maxWidth: root.showArtist ? 120 : 160
         }
 
         TrackMarqueeText {
+            visible: root.showArtist
             text: PlayerService.artist || "Unknown Artist"
             color: Appearance.colors.textSecondary
             fontSize: Appearance.fonts.sizes.sm

@@ -31,7 +31,9 @@ Loader {
 
         property real padding: 15
         property bool isContextMenuOpen: false
-        readonly property bool minimal: (Settings.player.widgetVariant ?? "full") === "minimal"
+        readonly property string variant: Settings.modules.player.variant ?? "full"
+        readonly property bool minimal: player.variant !== "full"
+        readonly property bool showArtist: player.variant !== "compact"
 
         implicitWidth: content.implicitWidth + padding * 2
         implicitHeight: content.implicitHeight + 15
@@ -125,6 +127,7 @@ Loader {
             TrackInfo {
                 anchors.verticalCenter: parent.verticalCenter
                 minimal: player.minimal
+                showArtist: player.showArtist
             }
 
             Item {
