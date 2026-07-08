@@ -56,7 +56,7 @@ System panel with workspace switcher, clock, RAM usage, network status, and volu
 Shows pinned and open applications with window count indicator dots for running windows only. Left-click cycles through windows (or launches when not running), middle-click launches a new instance, and right-click toggles pin/unpin. Pinned apps persist across restarts via `~/.config/yoru/settings.json`.
 
 **Music Player**
-MPRIS-based player widget for Spotify with album art, scrolling track info, playback controls, a progress bar, and a live audio waveform powered by [CAVA](https://github.com/karlstav/cava). Ships in two variants — a `full` layout (album art, stacked title/artist) and a `minimal` one (Spotify icon, single-line title + artist) — configurable via `~/.config/yoru/settings.json`; see [Player Widget Variant](#player-widget-variant) below.
+MPRIS-based player widget for Spotify with album art, scrolling track info, playback controls, a progress bar, and a live audio waveform powered by [CAVA](https://github.com/karlstav/cava). Ships in three variants — `full`, `minimal`, and `compact` — and can be placed in the top bar or the dock, configurable via `~/.config/yoru/settings.json`; see [Configuration](#configuration) below.
 
 **App Search**
 Fuzzy application search using FuzzySort with a smart icon resolution fallback chain — handles mismatched app IDs, Steam games, and more.
@@ -115,20 +115,87 @@ If something doesn't work:
 
 > WirePlumber 0.5+ is required for the automatic routing rule. Older setups will need the manual `pavucontrol` step.
 
-### Player Widget Variant
+### Configuration
 
-The player widget supports two layouts, controlled by `player.widgetVariant` in `~/.config/yoru/settings.json`:
+`~/.config/yoru/settings.json` is organized into two top-level sections:
+
+- **`layout`** — purely structural: which zone (dock / top bar left / center / right) each widget renders in, and in what order. No visual styling lives here.
+- **`modules`** — per-widget behavior/config: the player's variant, the voice dictation and wallpaper picker opt-in flags, the workspace count bounds.
 
 ```json
-"player": {
-    "widgetVariant": "minimal"
+{
+    "layout": {
+        "dock": {
+            "position": "bottom",
+            "items": ["apps"],
+            "pinnedApps": ["zen", "kitty", "Spotify"]
+        },
+        "topbar": {
+            "left": ["workspaces"],
+            "center": ["clock"],
+            "right": ["player", "memory", "network", "volume"]
+        }
+    },
+    "modules": {
+        "player": {
+            "variant": "full"
+        },
+        "speech": {
+            "enabled": false,
+            "socketPath": ""
+        },
+        "wallpaper": {
+            "enabled": false,
+            "directory": "",
+            "cacheDir": ""
+        },
+        "workspaces": {
+            "defaultCount": 5,
+            "maxCount": 10
+        }
+    }
+}
+```
+
+There is no in-app settings screen yet — it's plain JSON — but the shape above (structure separated from behavior, ordered arrays for placement) is deliberately meant to double as the data model for an in-app settings UI later.
+
+#### `layout.topbar` / `layout.dock` — widget placement
+
+- `layout.topbar.left` / `center` / `right` — each is an ordered list of tokens drawn from `"workspaces"`, `"clock"`, `"player"`, `"memory"`, `"network"`, `"volume"`. Move a token between arrays or reorder it within one to change where it renders — e.g. moving `"player"` to the front of `right` puts it before Memory, to the back puts it after Volume.
+- `layout.dock.items` — an ordered list of `"apps"` and, optionally, `"player"`. Since the dock is a single row, `"player"` can only go before or after `"apps"` (`["player", "apps"]` for the left edge, `["apps", "player"]` for the right edge) — there's no "middle" option, since splitting the app list in two would make it re-center unevenly as apps come and go.
+- `layout.dock.pinnedApps` — app IDs pinned to the dock so they show up even when not running (see [Application Dock](#features) above); persisted automatically when you pin/unpin from the right-click menu.
+- `layout.dock.position` — reserved for future use (currently only `"bottom"` is actually implemented; the dock is hardcoded to anchor to the bottom of the screen).
+- Leaving any of the three `topbar` arrays or `dock.items` empty (`[]`) renders nothing in that spot — it does not fall back to a default.
+
+#### `modules.player.variant` — player widget layout
+
+Controls the player's density, independent of where it's placed:
+
+```json
+"modules": {
+    "player": {
+        "variant": "compact"
+    }
 }
 ```
 
 - `"full"` *(default)* — album art, stacked title/artist, and the waveform.
 - `"minimal"` — a Spotify icon in place of the album art, title and artist on a single line, and a shorter waveform to match.
+- `"compact"` — same as `"minimal"` but drops the artist entirely, showing only the Spotify icon and the track title. Handy for tight spots like the dock.
 
-There is no in-app settings screen for this either — it's a single JSON field, same philosophy as the Voice Dictation flag below.
+#### `modules.workspaces` — workspace switcher bounds
+
+```json
+"modules": {
+    "workspaces": {
+        "defaultCount": 5,
+        "maxCount": 10
+    }
+}
+```
+
+- `defaultCount` — minimum number of workspace buttons always shown.
+- `maxCount` — hard ceiling; the switcher grows past `defaultCount` as you focus higher workspace numbers, up to this limit.
 
 ### Voice Dictation (optional)
 
@@ -137,12 +204,14 @@ Yoru can show a live speech-to-text preview while recording, backed by [yoru-spe
 To enable it:
 
 1. Install and run `yoru-speech` separately (see its own repo for setup — model selection, language, and everything else specific to transcription lives in *its* config, not Yoru's).
-2. Add a `speech` block to `~/.config/yoru/settings.json`:
+2. Add a `speech` block under `modules` in `~/.config/yoru/settings.json`:
 
    ```json
-   "speech": {
-       "enabled": true,
-       "socketPath": ""
+   "modules": {
+       "speech": {
+           "enabled": true,
+           "socketPath": ""
+       }
    }
    ```
 
@@ -158,13 +227,15 @@ Yoru can show a keyboard-driven wallpaper picker overlay, backed by [awww](https
 To enable it:
 
 1. Install and run `awww-daemon` separately (already handled by `exec-once = awww-daemon` if you're on this machine's Hyprland config).
-2. Add a `wallpaper` block to `~/.config/yoru/settings.json`:
+2. Add a `wallpaper` block under `modules` in `~/.config/yoru/settings.json`:
 
    ```json
-   "wallpaper": {
-       "enabled": true,
-       "directory": "",
-       "cacheDir": ""
+   "modules": {
+       "wallpaper": {
+           "enabled": true,
+           "directory": "",
+           "cacheDir": ""
+       }
    }
    ```
 
@@ -227,8 +298,8 @@ The install script handles all of these automatically on Arch.
 
 | Controller | Description |
 |------------|-------------|
-| `SpeechController.qml` | Bridges `yoru-speech` IPC events into `SpeechState` (see [Voice Dictation](#voice-dictation-optional)); only instantiated when `speech.enabled` is `true` |
-| `WallpaperController.qml` | Exposes a Quickshell `IpcHandler` (`qs ipc call wallpaper toggle`) that flips `WallpaperState.visible` (see [Wallpaper Picker](#wallpaper-picker-optional)); only instantiated when `wallpaper.enabled` is `true` |
+| `SpeechController.qml` | Bridges `yoru-speech` IPC events into `SpeechState` (see [Voice Dictation](#voice-dictation-optional)); only instantiated when `modules.speech.enabled` is `true` |
+| `WallpaperController.qml` | Exposes a Quickshell `IpcHandler` (`qs ipc call wallpaper toggle`) that flips `WallpaperState.visible` (see [Wallpaper Picker](#wallpaper-picker-optional)); only instantiated when `modules.wallpaper.enabled` is `true` |
 
 ## Copying
 
