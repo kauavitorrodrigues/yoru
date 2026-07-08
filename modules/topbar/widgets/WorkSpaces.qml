@@ -9,8 +9,8 @@ import "../../common"
 Item {
     id: root
 
-    readonly property int defaultWorkspaceCount: Math.max(1, Settings.topbar.workspaces.defaultCount ?? 5)
-    readonly property int maxWorkspaceCount: Math.max(root.defaultWorkspaceCount, Settings.topbar.workspaces.maxCount ?? 10)
+    readonly property int defaultWorkspaceCount: Math.max(1, Settings.modules.workspaces.defaultCount ?? 5)
+    readonly property int maxWorkspaceCount: Math.max(root.defaultWorkspaceCount, Settings.modules.workspaces.maxCount ?? 10)
     readonly property int focusedWorkspaceId: Hyprland.focusedWorkspace?.id ?? 1
     readonly property int workspaceCount: Math.min(
         root.maxWorkspaceCount,

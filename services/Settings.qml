@@ -12,14 +12,11 @@ Singleton {
     property string filePath: configDir + "/yoru/settings.json"
     property bool ready: false
 
-    property alias dock: settingsJsonAdapter.dock
-    property alias topbar: settingsJsonAdapter.topbar
-    property alias speech: settingsJsonAdapter.speech
-    property alias player: settingsJsonAdapter.player
-    property alias wallpaper: settingsJsonAdapter.wallpaper
+    property alias layout: settingsJsonAdapter.layout
+    property alias modules: settingsJsonAdapter.modules
 
     function setDockPinnedApps(appIds) {
-        settingsJsonAdapter.dock.pinnedApps = appIds;
+        settingsJsonAdapter.layout.dock.pinnedApps = appIds;
     }
 
     Timer {
@@ -55,30 +52,36 @@ Singleton {
         adapter: JsonAdapter {
             id: settingsJsonAdapter
 
-            property JsonObject dock: JsonObject {
-                property list<string> pinnedApps: []
+            property JsonObject layout: JsonObject {
+                property JsonObject dock: JsonObject {
+                    property string position: "bottom"
+                    property list<string> items: ["apps"]
+                    property list<string> pinnedApps: []
+                }
+                property JsonObject topbar: JsonObject {
+                    property list<string> left: ["workspaces"]
+                    property list<string> center: ["clock"]
+                    property list<string> right: ["player", "memory", "network", "volume"]
+                }
             }
 
-            property JsonObject topbar: JsonObject {
+            property JsonObject modules: JsonObject {
+                property JsonObject player: JsonObject {
+                    property string variant: "full"
+                }
+                property JsonObject speech: JsonObject {
+                    property bool enabled: false
+                    property string socketPath: ""
+                }
+                property JsonObject wallpaper: JsonObject {
+                    property bool enabled: false
+                    property string directory: ""
+                    property string cacheDir: ""
+                }
                 property JsonObject workspaces: JsonObject {
                     property int defaultCount: 5
                     property int maxCount: 10
                 }
-            }
-
-            property JsonObject speech: JsonObject {
-                property bool enabled: false
-                property string socketPath: ""
-            }
-
-            property JsonObject player: JsonObject {
-                property string widgetVariant: "full"
-            }
-
-            property JsonObject wallpaper: JsonObject {
-                property bool enabled: false
-                property string directory: ""
-                property string cacheDir: ""
             }
         }
     }

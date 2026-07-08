@@ -8,8 +8,8 @@ QtObject {
     id: root
 
     readonly property string resolvedSocketPath: {
-        if (Settings.speech.socketPath !== "")
-            return Settings.speech.socketPath;
+        if (Settings.modules.speech.socketPath !== "")
+            return Settings.modules.speech.socketPath;
         const runtimeDir = Quickshell.env("XDG_RUNTIME_DIR") || "/tmp";
         return runtimeDir + "/yoru-speech.sock";
     }

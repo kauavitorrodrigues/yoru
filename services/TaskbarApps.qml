@@ -12,15 +12,15 @@ Singleton {
     }
 
     function isPinned(appId) {
-        return Settings.dock.pinnedApps.indexOf(appId) !== -1;
+        return Settings.layout.dock.pinnedApps.indexOf(appId) !== -1;
     }
 
     function togglePin(appId) {
         if (!appId || appId === "SEPARATOR") return;
         if (root.isPinned(appId)) {
-            Settings.setDockPinnedApps(Settings.dock.pinnedApps.filter(id => id !== appId));
+            Settings.setDockPinnedApps(Settings.layout.dock.pinnedApps.filter(id => id !== appId));
         } else {
-            Settings.setDockPinnedApps(Settings.dock.pinnedApps.concat([appId]));
+            Settings.setDockPinnedApps(Settings.layout.dock.pinnedApps.concat([appId]));
         }
     }
 
@@ -29,7 +29,7 @@ Singleton {
         var map = new Map();
 
         // Pinned apps first (even when not running)
-        const pinnedApps = Settings.dock.pinnedApps || [];
+        const pinnedApps = Settings.layout.dock.pinnedApps || [];
         for (const appId of pinnedApps) {
             const key = normalizedAppId(appId);
             if (!key.length) continue;

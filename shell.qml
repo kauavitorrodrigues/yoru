@@ -10,17 +10,17 @@ ShellRoot {
     Dock {}
 
     LazyLoader {
-        active: Settings.speech.enabled
+        active: Settings.modules.speech.enabled
         component: SpeechController {}
     }
 
     LazyLoader {
-        active: Settings.wallpaper.enabled
+        active: Settings.modules.wallpaper.enabled
         component: WallpaperOverlay {}
     }
 
     LazyLoader {
-        active: Settings.wallpaper.enabled
+        active: Settings.modules.wallpaper.enabled
         component: WallpaperController {}
     }
 }

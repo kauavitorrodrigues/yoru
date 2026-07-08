@@ -28,8 +28,8 @@ PanelWindow {
     visible: root._mapped
     property bool _mapped: false
 
-    readonly property string resolvedDirectory: Settings.wallpaper.directory !== "" ? Settings.wallpaper.directory : (Quickshell.env("HOME") + "/Pictures/Wallpapers")
-    readonly property string resolvedCacheDir: Settings.wallpaper.cacheDir !== "" ? Settings.wallpaper.cacheDir : ((Quickshell.env("XDG_CACHE_HOME") || (Quickshell.env("HOME") + "/.cache")) + "/yoru/wallpaper-thumbnails")
+    readonly property string resolvedDirectory: Settings.modules.wallpaper.directory !== "" ? Settings.modules.wallpaper.directory : (Quickshell.env("HOME") + "/Pictures/Wallpapers")
+    readonly property string resolvedCacheDir: Settings.modules.wallpaper.cacheDir !== "" ? Settings.modules.wallpaper.cacheDir : ((Quickshell.env("XDG_CACHE_HOME") || (Quickshell.env("HOME") + "/.cache")) + "/yoru/wallpaper-thumbnails")
 
     WallpaperModel {
         id: wallpaperModel
