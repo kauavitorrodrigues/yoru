@@ -13,7 +13,7 @@ Button {
     property var appToplevel
     property var appListRoot
     property int lastFocused: -1
-    property real iconSize: Appearance.sizing.dock.iconSize
+    property real iconSize: Appearance.sizing.dock.icons.size
     property real countDotWidth: 10
     property real countDotHeight: 4
     property var desktopEntry: appToplevel ? DesktopEntries.heuristicLookup(appToplevel.appId) : null
@@ -44,11 +44,11 @@ Button {
 
     Rectangle {
         id: hoverBg
-        width: root.iconSize * 1.25
-        height: root.iconSize * 1.25
+        width: root.iconSize + Appearance.sizing.dock.icons.hoverPadding * 2
+        height: root.iconSize + Appearance.sizing.dock.icons.hoverPadding * 2
         anchors.centerIn: parent
         color: Appearance.colors.hoverStrong
-        radius: 13
+        radius: Appearance.sizing.dock.icons.hoverRadius
         opacity: 0
 
         Behavior on opacity {

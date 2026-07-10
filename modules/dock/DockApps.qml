@@ -27,7 +27,7 @@ Item {
     ListView {
 
         id: list
-        spacing: Appearance.sizing.dock.listSpacing
+        spacing: Appearance.sizing.dock.icons.spacing
         orientation: ListView.Horizontal
         implicitWidth: contentWidth
 

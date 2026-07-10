@@ -1,6 +1,7 @@
 pragma Singleton
 import QtQuick
 import Quickshell
+import qs.services
 
 Singleton {
     id: root
@@ -12,78 +13,87 @@ Singleton {
     property QtObject sizing
 
     animation: QtObject {
-        property int instant: 80
-        property int fast: 120
-        property int normal: 200
-        property int medium: 300
-        property int slow: 800
-        property int playerProgress: 900
-        property int marqueePause: 1500
+        property int instant: Settings.appearance.animation.instant
+        property int fast: Settings.appearance.animation.fast
+        property int normal: Settings.appearance.animation.normal
+        property int medium: Settings.appearance.animation.medium
+        property int slow: Settings.appearance.animation.slow
+        property int playerProgress: Settings.appearance.animation.playerProgress
+        property int marqueePause: Settings.appearance.animation.marqueePause
     }
 
     animationCurves: QtObject {
-        property int linear: Easing.Linear
-        property int inOutQuad: Easing.InOutQuad
-        property int inCubic: Easing.InCubic
-        property int outCubic: Easing.OutCubic
+        property int linear: Settings.appearance.animationCurves.linear
+        property int inOutQuad: Settings.appearance.animationCurves.inOutQuad
+        property int inCubic: Settings.appearance.animationCurves.inCubic
+        property int outCubic: Settings.appearance.animationCurves.outCubic
     }
 
     fonts: QtObject {
-        property string primary: "JetBrainsMono Nerd Font"
+        property string primary: Settings.appearance.fonts.primary
         property QtObject sizes: QtObject {
-            property int xs: 8
-            property int sm: 12
-            property int md: 13
-            property int base: 14
+            property int xs: Settings.appearance.fonts.sizes.xs
+            property int sm: Settings.appearance.fonts.sizes.sm
+            property int md: Settings.appearance.fonts.sizes.md
+            property int base: Settings.appearance.fonts.sizes.base
         }
     }
 
     colors: QtObject {
-        property color transparent: "transparent"
+        property color transparent: Settings.appearance.colors.transparent
 
-        property color shellSurface: Qt.rgba(0.08, 0.07, 0.07, 0.62)
-        property color shellSurfaceElevated: Qt.rgba(0.08, 0.07, 0.07, 0.72)
+        property color shellSurface: Settings.appearance.colors.shellSurface
+        property color shellSurfaceElevated: Settings.appearance.colors.shellSurfaceElevated
 
-        property color textPrimary: "#ffffff"
-        property color textSecondary: "#c4c4c4"
-        property color textMuted: "#a0a0a0"
-        property color textDisabled: Qt.rgba(1, 1, 1, 0.3)
-        property color textOnLight: "#505050"
+        property color textPrimary: Settings.appearance.colors.textPrimary
+        property color textSecondary: Settings.appearance.colors.textSecondary
+        property color textMuted: Settings.appearance.colors.textMuted
+        property color textDisabled: Settings.appearance.colors.textDisabled
+        property color textOnLight: Settings.appearance.colors.textOnLight
 
-        property color stateDanger: "#FF8080"
+        property color stateDanger: Settings.appearance.colors.stateDanger
 
-        property color hoverSoft: Qt.rgba(1, 1, 1, 0.12)
-        property color hoverStrong: Qt.rgba(1, 1, 1, 0.16)
+        property color hoverSoft: Settings.appearance.colors.hoverSoft
+        property color hoverStrong: Settings.appearance.colors.hoverStrong
 
-        property color indicatorActive: Qt.rgba(1, 1, 1, 0.9)
-        property color indicatorInactive: Qt.rgba(1, 1, 1, 0.45)
+        property color indicatorActive: Settings.appearance.colors.indicatorActive
+        property color indicatorInactive: Settings.appearance.colors.indicatorInactive
 
-        property color cardPlaceholder: Qt.rgba(1, 1, 1, 0.08)
-        property color scrim: Qt.rgba(0, 0, 0, 0.4)
+        property color cardPlaceholder: Settings.appearance.colors.cardPlaceholder
+        property color scrim: Settings.appearance.colors.scrim
     }
 
     sizing: QtObject {
         property QtObject dock: QtObject {
-            property int panelHeight: 72
-            property int bottomMargin: 14
-            property int radius: 18
-            property int padding: 14
-            property int iconSize: 38
-            property int listSpacing: 12
-            property int previewRadius: 14
+            property int panelHeight: Settings.appearance.sizing.dock.panelHeight
+            property int bottomMargin: Settings.appearance.sizing.dock.bottomMargin
+            property int radius: Settings.appearance.sizing.dock.radius
+            property QtObject padding: QtObject {
+                property int top: Settings.appearance.sizing.dock.padding.top
+                property int bottom: Settings.appearance.sizing.dock.padding.bottom
+                property int left: Settings.appearance.sizing.dock.padding.left
+                property int right: Settings.appearance.sizing.dock.padding.right
+            }
+            property int previewRadius: Settings.appearance.sizing.dock.previewRadius
+            property QtObject icons: QtObject {
+                property int size: Settings.appearance.sizing.dock.icons.size
+                property int spacing: Settings.appearance.sizing.dock.icons.spacing
+                property int hoverPadding: Settings.appearance.sizing.dock.icons.hoverPadding
+                property int hoverRadius: Settings.appearance.sizing.dock.icons.hoverRadius
+            }
         }
         property QtObject topbar: QtObject {
-            property int cardRadius: 15
-            property int workspaceButtonFocusedSize: 13
-            property int workspaceButtonIdleSize: 8
+            property int cardRadius: Settings.appearance.sizing.topbar.cardRadius
+            property int workspaceButtonFocusedSize: Settings.appearance.sizing.topbar.workspaceButtonFocusedSize
+            property int workspaceButtonIdleSize: Settings.appearance.sizing.topbar.workspaceButtonIdleSize
         }
         property QtObject wallpaper: QtObject {
-            property int overlayWidth: 1000
-            property int overlayHeight: 550
-            property int overlayRadius: 15
-            property int itemWidth: 200
-            property int itemHeight: 500
-            property int itemRadius: 12
+            property int overlayWidth: Settings.appearance.sizing.wallpaper.overlayWidth
+            property int overlayHeight: Settings.appearance.sizing.wallpaper.overlayHeight
+            property int overlayRadius: Settings.appearance.sizing.wallpaper.overlayRadius
+            property int itemWidth: Settings.appearance.sizing.wallpaper.itemWidth
+            property int itemHeight: Settings.appearance.sizing.wallpaper.itemHeight
+            property int itemRadius: Settings.appearance.sizing.wallpaper.itemRadius
         }
     }
 }

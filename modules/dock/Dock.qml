@@ -64,7 +64,7 @@ Scope {
 
                         id: dockBackground
 
-                        implicitWidth: dockRow.implicitWidth + dockRow.padding * 2
+                        implicitWidth: dockRow.implicitWidth + dockRow.paddingLeft + dockRow.paddingRight
                         height: parent.height
 
                         anchors {
@@ -86,22 +86,25 @@ Scope {
                         RowLayout {
                             id: dockRow
 
-                            property real padding: Appearance.sizing.dock.padding
+                            property real paddingTop: Appearance.sizing.dock.padding.top
+                            property real paddingBottom: Appearance.sizing.dock.padding.bottom
+                            property real paddingLeft: Appearance.sizing.dock.padding.left
+                            property real paddingRight: Appearance.sizing.dock.padding.right
 
                             readonly property var items: Settings.layout.dock.items
 
                             anchors {
                                 fill: parent
-                                leftMargin: padding
-                                rightMargin: padding
-                                topMargin: 1
-                                bottomMargin: 4
+                                leftMargin: paddingLeft
+                                rightMargin: paddingRight
+                                topMargin: paddingTop
+                                bottomMargin: paddingBottom
                             }
 
                             Component {
                                 id: dockAppsComponent
                                 DockApps {
-                                    buttonPadding: dockRow.padding
+                                    buttonPadding: dockRow.paddingLeft
                                 }
                             }
 
