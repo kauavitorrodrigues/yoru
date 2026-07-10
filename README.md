@@ -117,10 +117,11 @@ If something doesn't work:
 
 ### Configuration
 
-`~/.config/yoru/settings.json` is organized into two top-level sections:
+`~/.config/yoru/settings.json` is organized into three top-level sections:
 
 - **`layout`** — purely structural: which zone (dock / top bar left / center / right) each widget renders in, and in what order. No visual styling lives here.
 - **`modules`** — per-widget behavior/config: the player's variant, the voice dictation and wallpaper picker opt-in flags, the workspace count bounds.
+- **`appearance`** — every visual token the shell renders with: animation durations/curves, font family/sizes, colors, and per-feature sizing (icon size, radii, padding, etc.). This is a 1:1 override of `Appearance.qml`'s defaults — anything you don't set falls back to the built-in value.
 
 ```json
 {
@@ -153,11 +154,23 @@ If something doesn't work:
             "defaultCount": 5,
             "maxCount": 10
         }
+    },
+    "appearance": {
+        "sizing": {
+            "dock": {
+                "icons": {
+                    "size": 44
+                }
+            }
+        },
+        "colors": {
+            "textPrimary": "#ffffff"
+        }
     }
 }
 ```
 
-There is no in-app settings screen yet — it's plain JSON — but the shape above (structure separated from behavior, ordered arrays for placement) is deliberately meant to double as the data model for an in-app settings UI later.
+There is no in-app settings screen yet — it's plain JSON — but the shape above (structure separated from behavior, ordered arrays for placement) is deliberately meant to double as the data model for an in-app settings UI later. You only need to specify the keys you want to override — `appearance` (like `layout` and `modules`) is deep-merged with the built-in defaults, so a partial block like the one above is enough to bump the dock's icon size without repeating every other token.
 
 #### `layout.topbar` / `layout.dock` — widget placement
 
@@ -196,6 +209,63 @@ Controls the player's density, independent of where it's placed:
 
 - `defaultCount` — minimum number of workspace buttons always shown.
 - `maxCount` — hard ceiling; the switcher grows past `defaultCount` as you focus higher workspace numbers, up to this limit.
+
+#### `appearance` — theme tokens
+
+Every constant in `modules/common/Appearance.qml` is overridable here, grouped the same way it's defined there:
+
+```json
+"appearance": {
+    "animation": {
+        "instant": 80, "fast": 120, "normal": 200, "medium": 300, "slow": 800,
+        "playerProgress": 900, "marqueePause": 1500
+    },
+    "animationCurves": {
+        "linear": 0, "inOutQuad": 0, "inCubic": 0, "outCubic": 0
+    },
+    "fonts": {
+        "primary": "JetBrainsMono Nerd Font",
+        "sizes": { "xs": 8, "sm": 12, "md": 13, "base": 14 }
+    },
+    "colors": {
+        "transparent": "transparent",
+        "shellSurface": "#9e141212", "shellSurfaceElevated": "#b8141212",
+        "textPrimary": "#ffffff", "textSecondary": "#c4c4c4", "textMuted": "#a0a0a0",
+        "textDisabled": "#4cffffff", "textOnLight": "#505050",
+        "stateDanger": "#FF8080",
+        "hoverSoft": "#1fffffff", "hoverStrong": "#29ffffff",
+        "indicatorActive": "#e6ffffff", "indicatorInactive": "#73ffffff",
+        "cardPlaceholder": "#14ffffff", "scrim": "#66000000"
+    },
+    "sizing": {
+        "dock": {
+            "panelHeight": 72, "bottomMargin": 14, "radius": 18,
+            "padding": { "top": 1, "bottom": 4, "left": 14, "right": 14 },
+            "previewRadius": 14,
+            "icons": {
+                "size": 38, "spacing": 12, "hoverPadding": 5, "hoverRadius": 13
+            }
+        },
+        "topbar": {
+            "cardRadius": 15, "workspaceButtonFocusedSize": 13, "workspaceButtonIdleSize": 8
+        },
+        "wallpaper": {
+            "overlayWidth": 1000, "overlayHeight": 550, "overlayRadius": 15,
+            "itemWidth": 200, "itemHeight": 500, "itemRadius": 12
+        }
+    }
+}
+```
+
+- `animation` — durations in milliseconds for hover/press transitions, crossfades, the player's progress bar, and the dock/topbar marquee pause.
+- `animationCurves` — [`Easing`](https://doc.qt.io/qt-6/qml-qtquick-propertyanimation.html#easing.type-prop) curve type enum values used by those animations (leave these alone unless you know the specific Qt enum ints you want).
+- `fonts` — the shell's font family and the size scale (`xs`/`sm`/`md`/`base`, in px) used across widgets.
+- `colors` — every color token the shell draws with, as `"#RRGGBB"` or `"#AARRGGBB"` (alpha-first) hex strings — surfaces, text tones, hover/indicator states, and the danger/scrim colors.
+- `sizing` — per-feature layout constants: dock panel height/padding/icon sizing/radii, topbar card radius and workspace dot sizes, and wallpaper overlay/thumbnail dimensions.
+- `sizing.dock.padding` — insets the dock's row of items from its background on each side independently (`top`/`bottom`/`left`/`right`); e.g. `{ "left": 30, "right": 2 }` shifts the whole item row toward the right edge instead of centering it. Note this is unrelated to `layout.dock.items` — an unrecognized token there (anything other than `"apps"`/`"player"`) silently renders as a zero-width slot that still eats one `icons.spacing` gap, which looks just like uneven padding on whichever side it lands. If one edge looks off even with equal `padding.left`/`right`, check `layout.dock.items` for a typo before touching this.
+- `sizing.dock.icons` — everything about the dock's app icons grouped under one key instead of scattering `icon`-prefixed fields across `sizing.dock`: `size` (icon dimensions), `spacing` (gap between icons), `hoverPadding`/`hoverRadius` (the highlight circle behind an icon on hover — `hoverPadding` is how many pixels it extends past `size` on each side, so the highlight scales sensibly if you change `size` instead of looking too tight or too loose).
+
+Colors and sizes both accept partial overrides — e.g. bumping just `sizing.dock.icons.size` to make dock icons bigger, or `colors.textPrimary` to shift the whole shell's primary text color, without touching anything else.
 
 ### Voice Dictation (optional)
 
