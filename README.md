@@ -129,7 +129,8 @@ If something doesn't work:
         "dock": {
             "position": "bottom",
             "items": ["apps"],
-            "pinnedApps": ["zen", "kitty", "Spotify"]
+            "pinnedApps": ["zen", "kitty", "Spotify"],
+            "autoHide": false
         },
         "topbar": {
             "left": ["workspaces"],
@@ -178,6 +179,7 @@ There is no in-app settings screen yet — it's plain JSON — but the shape abo
 - `layout.dock.items` — an ordered list of `"apps"` and, optionally, `"player"`. Since the dock is a single row, `"player"` can only go before or after `"apps"` (`["player", "apps"]` for the left edge, `["apps", "player"]` for the right edge) — there's no "middle" option, since splitting the app list in two would make it re-center unevenly as apps come and go.
 - `layout.dock.pinnedApps` — app IDs pinned to the dock so they show up even when not running (see [Application Dock](#features) above); persisted automatically when you pin/unpin from the right-click menu.
 - `layout.dock.position` — reserved for future use (currently only `"bottom"` is actually implemented; the dock is hardcoded to anchor to the bottom of the screen).
+- `layout.dock.autoHide` — when `true`, the dock stops reserving screen space (windows can use the full height) and only reveals itself as a floating overlay, hiding again shortly after the cursor leaves. Same behavior as macOS/GNOME auto-hide docks — nothing reflows when it appears or disappears, it just fades/slides over whatever's underneath. The reveal trigger is a hairline strip glued to the true bottom edge of the screen (not the dock's own — larger — floating footprint), so it doesn't fire when you're just interacting with normal app content near the bottom of the screen. Defaults to `false`.
 - Leaving any of the three `topbar` arrays or `dock.items` empty (`[]`) renders nothing in that spot — it does not fall back to a default.
 
 #### `modules.player.variant` — player widget layout

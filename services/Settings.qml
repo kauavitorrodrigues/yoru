@@ -58,6 +58,7 @@ Singleton {
                     property string position: "bottom"
                     property list<string> items: ["apps"]
                     property list<string> pinnedApps: []
+                    property bool autoHide: false
                 }
                 property JsonObject topbar: JsonObject {
                     property list<string> left: ["workspaces"]
