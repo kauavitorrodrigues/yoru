@@ -125,7 +125,10 @@ Item {
 
     MouseArea {
         anchors.fill: parent
-        onClicked: ListView.view.currentIndex = root.index
+        // The ListView attached property is only populated on the delegate's
+        // root object, so it must be read through `root` — reading it directly
+        // here (on the MouseArea) yields null and throws on assignment.
+        onClicked: root.ListView.view.currentIndex = root.index
         onDoubleClicked: if (root.distanceFromCenter === 0)
             root.applyRequested(root.index)
     }
