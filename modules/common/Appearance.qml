@@ -91,6 +91,7 @@ Singleton {
             property int idleHeight: Settings.appearance.sizing.island.idleHeight
             property int idleWidth: Settings.appearance.sizing.island.idleWidth
             property int hiddenHeight: Settings.appearance.sizing.island.hiddenHeight
+            property int hotspotWidth: Settings.appearance.sizing.island.hotspotWidth
             property int radius: Settings.appearance.sizing.island.radius
             property int padding: Settings.appearance.sizing.island.padding
             property int maxWidth: Settings.appearance.sizing.island.maxWidth

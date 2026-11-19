@@ -45,7 +45,32 @@ PanelWindow {
             return "speech";
         if (current !== "")
             return current;
-        return cfg.idle === "hidden" && !hovered ? "hidden" : "idle";
+        return autoHide && !revealed ? "hidden" : "idle";
+    }
+
+    // Auto-hide (same idea as the dock): fully hidden until the cursor reaches
+    // the top-center of the screen. While hidden, the pill collapses into an
+    // invisible hairline strip (hotspotWidth wide) that catches the cursor.
+    // It hides again shortly after the cursor leaves, unless something is being shown.
+    readonly property bool autoHide: cfg.autoHide
+    property bool revealed: !autoHide
+    readonly property bool wantsVisible: !autoHide || hovered || opened || recording || current !== ""
+
+    onAutoHideChanged: revealed = !autoHide
+    onWantsVisibleChanged: {
+        if (wantsVisible) {
+            hideTimer.stop();
+            revealed = true;
+        } else {
+            hideTimer.restart();
+        }
+    }
+
+    // Debounces hiding so a brief mouse-out doesn't flicker the island away.
+    Timer {
+        id: hideTimer
+        interval: Appearance.animation.medium
+        onTriggered: root.revealed = false
     }
 
     // The view actually shown; trails targetView so content can cross-fade
@@ -246,7 +271,7 @@ PanelWindow {
         anchors.top: parent.top
         anchors.horizontalCenter: parent.horizontalCenter
 
-        width: hidden ? root.sizes.idleWidth : Math.min(root.width - flare * 2, Math.max(root.sizes.idleWidth, contentWidth + pad * 2))
+        width: hidden ? root.sizes.hotspotWidth : Math.min(root.width - flare * 2, Math.max(root.sizes.idleWidth, contentWidth + pad * 2))
         height: hidden ? root.sizes.hiddenHeight : Math.min(root.height, Math.max(root.sizes.idleHeight, contentHeight + (popover ? pad * 2 : 14)))
 
         Behavior on width {
@@ -278,9 +303,17 @@ PanelWindow {
             readonly property real rb: Math.max(0, Math.min(pill.radius, pill.height - r, pill.width / 2))
 
             x: -pill.flare
+            opacity: pill.hidden ? 0 : 1
             width: pill.width + pill.flare * 2
             height: pill.height
             preferredRendererType: Shape.CurveRenderer
+
+            Behavior on opacity {
+                NumberAnimation {
+                    duration: Appearance.animation.fast
+                    easing.type: Appearance.animationCurves.inOutQuad
+                }
+            }
 
             ShapePath {
                 strokeWidth: -1

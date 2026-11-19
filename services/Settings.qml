@@ -92,7 +92,7 @@ Singleton {
                     property int autoCollapseMs: 2500
                     property bool expandOnHover: false // hover also opens it (click always does)
                     property bool closeOnLeave: false // close shortly after the cursor leaves
-                    property string idle: "clock" // "clock" | "hidden"
+                    property bool autoHide: false // hide until the cursor reaches the top-center of the screen
                     property string monitor: "" // "" = first screen
                     property list<string> events: ["player", "volume", "network"]
                 }
@@ -178,6 +178,7 @@ Singleton {
                         property int idleHeight: 34
                         property int idleWidth: 120
                         property int hiddenHeight: 4
+                        property int hotspotWidth: 360
                         property int radius: 20
                         property int padding: 18
                         property int maxWidth: 440

@@ -192,7 +192,7 @@ Set `layout.topbar.mode` to `"island"` to replace the top bar with a macOS-style
     "island": {
         "autoCollapseMs": 2500,
         "expandOnHover": true,
-        "idle": "clock",
+        "autoHide": false,
         "monitor": "",
         "events": ["player", "volume", "workspace", "network"]
     }
@@ -202,7 +202,7 @@ Set `layout.topbar.mode` to `"island"` to replace the top bar with a macOS-style
 - `events` — which events briefly expand the island: `"player"` (track/play state), `"volume"`, `"workspace"`, `"network"`. Voice dictation always takes over the island while recording.
 - `autoCollapseMs` — how long an event stays visible before the island collapses again.
 - `expandOnHover` — hovering the island shows the clock plus the current track.
-- `idle` — `"clock"` (default) or `"hidden"` (a thin strip that can still be hovered).
+- `autoHide` — when `true`, the island is fully hidden and only appears while the cursor is in a hairline hotspot at the top-center of the screen (`appearance.sizing.island.hotspotWidth` wide), hiding again shortly after it leaves. Same behavior as the dock's `autoHide`. It also appears briefly for events, while recording, or while the popover is open. Defaults to `false`.
 - `monitor` — output name to show the island on (e.g. `"eDP-1"`); empty means the first screen.
 - Manual control: `qs ipc call island toggle` (also `expand` / `collapse`).
 - Sizes and the surface color live in `appearance.sizing.island` and `appearance.colors.islandSurface`.
