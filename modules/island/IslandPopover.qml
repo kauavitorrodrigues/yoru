@@ -1,4 +1,3 @@
-import "../player/track"
 import "../topbar/widgets"
 import "../common"
 import qs.services
@@ -9,7 +8,7 @@ import Quickshell.Services.Pipewire
 import Quickshell.Services.UPower
 
 // Content of the opened island: the usual workspace switcher on top, then a
-// media card and a row of quick-setting tiles (volume, network, memory, battery).
+// grid of quick-setting tiles, 3 per row (volume, network, bluetooth, memory, battery, spotify).
 Column {
     id: root
 
@@ -22,6 +21,11 @@ Column {
 
     Battery {
         id: batteryProbe
+        visible: false
+    }
+
+    BluetoothIndicator {
+        id: bluetoothProbe
         visible: false
     }
 
@@ -197,83 +201,13 @@ Column {
         }
     }
 
-    // --- Media card --------------------------------------------------------
-
-    Card {
-        id: media
-
-        visible: PlayerService.activePlayer !== null
-        width: root.width
-        implicitHeight: mediaColumn.implicitHeight + 24
-
-        Column {
-            id: mediaColumn
-
-            anchors {
-                left: parent.left
-                right: parent.right
-                top: parent.top
-                margins: 12
-            }
-            spacing: 10
-
-            Item {
-                width: parent.width
-                height: 56
-
-                TrackAlbum {
-                    id: art
-                    size: 56
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-
-                TrackInfo {
-                    anchors.left: art.right
-                    anchors.leftMargin: 12
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-
-                Loader {
-                    anchors.right: parent.right
-                    anchors.verticalCenter: parent.verticalCenter
-                    active: PlayerService.hasAudioContext
-                    sourceComponent: WaveForm {
-                        amplitudes: PlayerService.amplitudes
-                        maxBarHeight: 24
-                        barWidth: 3
-                        spacing: 2
-
-                        Component.onCompleted: PlayerService.visualizerUsers += 1
-                        Component.onDestruction: PlayerService.visualizerUsers -= 1
-                    }
-                }
-            }
-
-            Item {
-                width: parent.width
-                height: 16
-
-                TrackProgress {
-                    anchors.fill: parent
-                }
-            }
-
-            Item {
-                width: parent.width
-                height: controls.implicitHeight
-
-                TrackControls {
-                    id: controls
-                }
-            }
-        }
-    }
-
     // --- Quick tiles -------------------------------------------------------
 
-    RowLayout {
+    GridLayout {
         width: root.width
-        spacing: 10
+        columns: 3
+        rowSpacing: 10
+        columnSpacing: 10
 
         Tile {
             icon: root.muted || root.volume === 0 ? "" : root.volume < 0.66 ? "" : ""
@@ -301,6 +235,17 @@ Column {
         }
 
         Tile {
+            visible: bluetoothProbe.active
+            icon: "󰂱"
+            title: bluetoothProbe.active ? bluetoothProbe.connectedDevices[0].name : ""
+            subtitle: {
+                const n = bluetoothProbe.connectedDevices.length;
+                return n > 1 ? "Bluetooth · +" + (n - 1) : "Bluetooth";
+            }
+            progress: bluetoothProbe.active && bluetoothProbe.connectedDevices[0].batteryAvailable ? bluetoothProbe.connectedDevices[0].battery : -1
+        }
+
+        Tile {
             icon: ""
             title: memoryProbe.usedGb.toFixed(1) + " GB"
             subtitle: memoryProbe.totalGb > 0 ? "of " + memoryProbe.totalGb.toFixed(1) + " GB" : "Memory"
@@ -325,6 +270,92 @@ Column {
             }
             progress: batteryProbe.percent / 100
             progressColor: batteryProbe.low ? Appearance.colors.stateDanger : Appearance.colors.indicatorActive
+        }
+
+        // Sixth tile: the current Spotify track (click = play/pause, scroll = next/previous).
+        Tile {
+            id: mediaTile
+
+            readonly property var player: PlayerService.activePlayer
+            readonly property real pos: player ? player.position : 0
+            readonly property real len: player ? player.length : 0
+
+            visible: player !== null
+            icon: "󰓇"
+            iconColor: PlayerService.isPlaying ? "#1DB954" : Appearance.colors.textSecondary
+            title: PlayerService.title !== "" ? PlayerService.title : "Spotify"
+            subtitle: PlayerService.artist
+            progress: len > 0 ? pos / len : -1
+            progressColor: "#1DB954"
+
+            Behavior on iconColor {
+                ColorAnimation {
+                    duration: Appearance.animation.medium
+                    easing.type: Appearance.animationCurves.inOutQuad
+                }
+            }
+
+            onClicked: PlayerService.playPause()
+            onScrolled: dy => dy > 0 ? PlayerService.previous() : PlayerService.next()
+
+            // Mini transport controls, top right (sit above the tile's own click area).
+            Row {
+                anchors {
+                    top: parent.top
+                    right: parent.right
+                    topMargin: 10
+                    rightMargin: 8
+                }
+                spacing: 2
+
+                Repeater {
+                    model: [
+                        { glyph: "󰒮", action: "prev" },
+                        { glyph: PlayerService.isPlaying ? "󰏤" : "󰐊", action: "toggle" },
+                        { glyph: "󰒭", action: "next" }
+                    ]
+
+                    delegate: Rectangle {
+                        required property var modelData
+
+                        width: 26
+                        height: 26
+                        radius: 13
+                        color: btnArea.containsMouse ? Appearance.colors.hoverStrong : "transparent"
+
+                        Text {
+                            anchors.centerIn: parent
+                            text: parent.modelData.glyph
+                            font.family: Appearance.fonts.primary
+                            font.pixelSize: 16
+                            color: Appearance.colors.textPrimary
+                        }
+
+                        MouseArea {
+                            id: btnArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            onClicked: {
+                                const a = parent.modelData.action;
+                                if (a === "prev")
+                                    PlayerService.previous();
+                                else if (a === "next")
+                                    PlayerService.next();
+                                else
+                                    PlayerService.playPause();
+                            }
+                        }
+                    }
+                }
+            }
+
+            Timer {
+                interval: 1000
+                repeat: true
+                running: mediaTile.visible && PlayerService.isPlaying
+                onTriggered: if (mediaTile.player)
+                    mediaTile.player.positionChanged()
+            }
         }
     }
 }
