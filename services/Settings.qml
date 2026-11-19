@@ -59,6 +59,8 @@ Singleton {
                     property list<string> items: ["apps"]
                     property list<string> pinnedApps: []
                     property bool autoHide: false
+                    property string preview: "live" // "live" | "static" | "off"
+                    property int previewMaxWindows: 3
                 }
                 property JsonObject topbar: JsonObject {
                     property list<string> left: ["workspaces"]
