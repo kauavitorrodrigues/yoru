@@ -28,6 +28,22 @@ PanelWindow {
     visible: root._mapped
     property bool _mapped: false
 
+    // Drives the fade-in. The overlay is created on demand, after
+    // WallpaperState.visible is already true, so this starts false and is
+    // bound to it once the first frame exists; otherwise it would appear
+    // fully opaque with no fade.
+    property bool _shown: false
+
+    Component.onCompleted: {
+        // Created because the picker was just opened: onVisibleChanged below
+        // already fired before this object existed, so do its work here.
+        if (WallpaperState.visible) {
+            root._mapped = true;
+            wallpaperModel.startScan();
+        }
+        root._shown = Qt.binding(() => WallpaperState.visible);
+    }
+
     readonly property string resolvedDirectory: Settings.modules.wallpaper.directory !== "" ? Settings.modules.wallpaper.directory : (Quickshell.env("HOME") + "/Pictures/Wallpapers")
     readonly property string resolvedCacheDir: Settings.modules.wallpaper.cacheDir !== "" ? Settings.modules.wallpaper.cacheDir : ((Quickshell.env("XDG_CACHE_HOME") || (Quickshell.env("HOME") + "/.cache")) + "/yoru/wallpaper-thumbnails")
 
@@ -70,7 +86,7 @@ PanelWindow {
         anchors.fill: parent
         color: Appearance.colors.shellSurfaceElevated
         radius: Appearance.sizing.wallpaper.overlayRadius
-        opacity: WallpaperState.visible ? 1.0 : 0.0
+        opacity: root._shown ? 1.0 : 0.0
 
         Behavior on opacity {
             NumberAnimation {

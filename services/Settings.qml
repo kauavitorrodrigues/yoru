@@ -83,6 +83,9 @@ Singleton {
                     property bool enabled: false
                     property string directory: ""
                     property string cacheDir: ""
+                    // false = square cards, which avoids the offscreen layers + mask
+                    // used for rounded corners (cheaper on low-memory machines).
+                    property bool roundedCards: true
                 }
                 property JsonObject workspaces: JsonObject {
                     property int defaultCount: 5
