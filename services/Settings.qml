@@ -67,6 +67,7 @@ Singleton {
                     property list<string> center: ["clock"]
                     property list<string> right: ["player", "memory", "network", "volume"]
                     property int memoryPollMs: 5000
+                    property string mode: "bar" // "bar" | "island"
                 }
             }
 
@@ -86,6 +87,14 @@ Singleton {
                     // false = square cards, which avoids the offscreen layers + mask
                     // used for rounded corners (cheaper on low-memory machines).
                     property bool roundedCards: true
+                }
+                property JsonObject island: JsonObject {
+                    property int autoCollapseMs: 2500
+                    property bool expandOnHover: false // hover also opens it (click always does)
+                    property bool closeOnLeave: false // close shortly after the cursor leaves
+                    property string idle: "clock" // "clock" | "hidden"
+                    property string monitor: "" // "" = first screen
+                    property list<string> events: ["player", "volume", "network"]
                 }
                 property JsonObject workspaces: JsonObject {
                     property int defaultCount: 5
@@ -143,7 +152,7 @@ Singleton {
                 }
                 property JsonObject sizing: JsonObject {
                     property JsonObject dock: JsonObject {
-                        property int panelHeight: 72
+                        property int panelHeight: 84
                         property int bottomMargin: 14
                         property int radius: 18
                         property JsonObject padding: JsonObject {
@@ -154,7 +163,7 @@ Singleton {
                         }
                         property int previewRadius: 14
                         property JsonObject icons: JsonObject {
-                            property int size: 38
+                            property int size: 46
                             property int spacing: 12
                             property int hoverPadding: 5
                             property int hoverRadius: 13
@@ -164,6 +173,16 @@ Singleton {
                         property int cardRadius: 15
                         property int workspaceButtonFocusedSize: 13
                         property int workspaceButtonIdleSize: 8
+                    }
+                    property JsonObject island: JsonObject {
+                        property int idleHeight: 34
+                        property int idleWidth: 120
+                        property int hiddenHeight: 4
+                        property int radius: 20
+                        property int padding: 18
+                        property int maxWidth: 440
+                        property int openMargin: 10
+                        property int flare: 12 // concave "wave" where the island meets the top edge
                     }
                     property JsonObject wallpaper: JsonObject {
                         property int overlayWidth: 1000

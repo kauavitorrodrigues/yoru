@@ -1,4 +1,5 @@
 import "modules/topbar"
+import "modules/island"
 import "modules/dock"
 import "modules/wallpaper"
 import "modules/wallpaper/state"
@@ -7,7 +8,16 @@ import "services"
 import Quickshell
 
 ShellRoot {
-    TopBar {}
+    LazyLoader {
+        active: Settings.layout.topbar.mode !== "island"
+        component: TopBar {}
+    }
+
+    LazyLoader {
+        active: Settings.layout.topbar.mode === "island"
+        component: Island {}
+    }
+
     Dock {}
 
     LazyLoader {

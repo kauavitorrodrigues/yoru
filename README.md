@@ -182,6 +182,31 @@ There is no in-app settings screen yet — it's plain JSON — but the shape abo
 - `layout.dock.autoHide` — when `true`, the dock stops reserving screen space (windows can use the full height) and only reveals itself as a floating overlay, hiding again shortly after the cursor leaves. Same behavior as macOS/GNOME auto-hide docks — nothing reflows when it appears or disappears, it just fades/slides over whatever's underneath. The reveal trigger is a hairline strip glued to the true bottom edge of the screen (not the dock's own — larger — floating footprint), so it doesn't fire when you're just interacting with normal app content near the bottom of the screen. Defaults to `false`.
 - Leaving any of the three `topbar` arrays or `dock.items` empty (`[]`) renders nothing in that spot — it does not fall back to a default.
 
+#### `layout.topbar.mode` / `modules.island` — notebook mode (Dynamic Island)
+
+Set `layout.topbar.mode` to `"island"` to replace the top bar with a macOS-style island: a solid pill glued to the top edge of the screen, horizontally centered, with only its bottom corners rounded. It reserves no screen space and none of the other top bar widgets are shown. The default is `"bar"`.
+
+```json
+"layout": { "topbar": { "mode": "island" } },
+"modules": {
+    "island": {
+        "autoCollapseMs": 2500,
+        "expandOnHover": true,
+        "idle": "clock",
+        "monitor": "",
+        "events": ["player", "volume", "workspace", "network"]
+    }
+}
+```
+
+- `events` — which events briefly expand the island: `"player"` (track/play state), `"volume"`, `"workspace"`, `"network"`. Voice dictation always takes over the island while recording.
+- `autoCollapseMs` — how long an event stays visible before the island collapses again.
+- `expandOnHover` — hovering the island shows the clock plus the current track.
+- `idle` — `"clock"` (default) or `"hidden"` (a thin strip that can still be hovered).
+- `monitor` — output name to show the island on (e.g. `"eDP-1"`); empty means the first screen.
+- Manual control: `qs ipc call island toggle` (also `expand` / `collapse`).
+- Sizes and the surface color live in `appearance.sizing.island` and `appearance.colors.islandSurface`.
+
 #### `modules.player.variant` — player widget layout
 
 Controls the player's density, independent of where it's placed:
@@ -243,11 +268,11 @@ Every constant in `modules/common/Appearance.qml` is overridable here, grouped t
     },
     "sizing": {
         "dock": {
-            "panelHeight": 72, "bottomMargin": 14, "radius": 18,
+            "panelHeight": 84, "bottomMargin": 14, "radius": 18,
             "padding": { "top": 1, "bottom": 4, "left": 14, "right": 14 },
             "previewRadius": 14,
             "icons": {
-                "size": 38, "spacing": 12, "hoverPadding": 5, "hoverRadius": 13
+                "size": 46, "spacing": 12, "hoverPadding": 5, "hoverRadius": 13
             }
         },
         "topbar": {
@@ -354,6 +379,7 @@ The install script handles all of these automatically on Arch.
 | Module | Description |
 |--------|-------------|
 | `modules/topbar/` | Top bar container and all system widgets |
+| `modules/island/` | Dynamic Island shown instead of the top bar (`mode: "island"`) |
 | `modules/dock/` | Dock with open app list and per-app buttons |
 | `modules/player/` | Full player UI — album, info, controls, waveform |
 | `modules/speech/` | Voice dictation UI — waveform indicator and live transcript pill (optional, see [Voice Dictation](#voice-dictation-optional)) |
