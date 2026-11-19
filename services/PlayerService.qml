@@ -38,10 +38,17 @@ Singleton {
     property string _pendingLine: ""
 
     readonly property var players: Mpris.players.values
+    // The native Spotify app wins; otherwise a browser tab on open.spotify.com
+    // (metadata only: its audio isn't routed to the visualizer sink).
+    function _isSpotifyWeb(p) {
+        const url = p.metadata ? (p.metadata["xesam:url"] ?? "") : "";
+        return String(url).startsWith("https://open.spotify.com");
+    }
+
     readonly property var activePlayer: {
-        return players.find((p) => {
-            return supportedPlayersIds.includes(p.identity.toLowerCase());
-        }) ?? null;
+        return players.find((p) => supportedPlayersIds.includes(p.identity.toLowerCase()))
+            ?? players.find((p) => _isSpotifyWeb(p))
+            ?? null;
     }
 
     function update() {
