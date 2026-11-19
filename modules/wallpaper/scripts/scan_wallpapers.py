@@ -11,10 +11,9 @@ SUPPORTED_EXTENSIONS = frozenset({
 })
 
 
-def scan(wallpaper_dir: str) -> None:
+def list_wallpapers(wallpaper_dir: str) -> list:
     if not os.path.isdir(wallpaper_dir):
-        print(json.dumps([]))
-        return
+        return []
 
     results = []
     for root, dirs, files in os.walk(wallpaper_dir):
@@ -25,7 +24,11 @@ def scan(wallpaper_dir: str) -> None:
                 path = os.path.join(root, filename)
                 results.append({"path": path, "fileName": filename})
 
-    print(json.dumps(results))
+    return results
+
+
+def scan(wallpaper_dir: str) -> None:
+    print(json.dumps(list_wallpapers(wallpaper_dir)))
 
 
 if __name__ == "__main__":

@@ -107,7 +107,7 @@ Item {
                 if (results.length === 0)
                     return;
 
-                thumbProcess.command = ["python3", root.scriptDir + "generate_thumbnails.py", root.cacheDir, String(Appearance.sizing.wallpaper.itemWidth), String(Appearance.sizing.wallpaper.itemHeight)].concat(results.map(r => r.path));
+                thumbProcess.command = ["python3", root.scriptDir + "generate_thumbnails.py", root.cacheDir, String(Appearance.sizing.wallpaper.itemWidth), String(Appearance.sizing.wallpaper.itemHeight), "--dir", root.directory];
                 thumbProcess.running = true;
             }
         }
