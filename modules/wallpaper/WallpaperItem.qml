@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Effects
 import "../common"
 import "state"
+import "../../services"
 
 Item {
     id: root
@@ -16,6 +17,10 @@ Item {
 
     width: Appearance.sizing.wallpaper.itemWidth
     height: Appearance.sizing.wallpaper.itemHeight
+
+    // Square cards skip the two offscreen layers and the MultiEffect mask,
+    // which is the main per-card GPU memory cost (modules.wallpaper.roundedCards).
+    readonly property bool rounded: Settings.modules.wallpaper.roundedCards
 
     readonly property bool isAnimated: fileName.toLowerCase().endsWith(".gif")
     // WallpaperState.visible is required here: distanceFromCenter doesn't
@@ -49,9 +54,9 @@ Item {
     Item {
         id: cardSource
         anchors.fill: parent
-        layer.enabled: true
+        layer.enabled: root.rounded
         layer.smooth: true
-        opacity: 0
+        opacity: root.rounded ? 0 : 1
 
         Rectangle {
             anchors.fill: parent
@@ -62,6 +67,9 @@ Item {
             id: staticThumb
             anchors.fill: parent
             source: thumbnailPath || ""
+            // Never decode more than the card needs, even if a larger file
+            // ends up in the cache.
+            sourceSize: Qt.size(root.width, root.height)
             fillMode: Image.PreserveAspectCrop
             asynchronous: true
             cache: false
@@ -95,23 +103,30 @@ Item {
     }
 
     // roundMask's shape clips cardSource's layer texture to rounded corners.
-    Rectangle {
-        id: roundMask
+    // Only created when rounded cards are enabled.
+    Loader {
         anchors.fill: parent
-        radius: Appearance.sizing.wallpaper.itemRadius
-        color: "white"
-        visible: false
-        layer.enabled: true
-        layer.smooth: true
-    }
+        active: root.rounded
+        sourceComponent: Item {
+            Rectangle {
+                id: roundMask
+                anchors.fill: parent
+                radius: Appearance.sizing.wallpaper.itemRadius
+                color: "white"
+                visible: false
+                layer.enabled: true
+                layer.smooth: true
+            }
 
-    MultiEffect {
-        anchors.fill: parent
-        source: cardSource
-        maskEnabled: true
-        maskSource: roundMask
-        maskThresholdMin: 0.5
-        maskSpreadAtMin: 0.0
+            MultiEffect {
+                anchors.fill: parent
+                source: cardSource
+                maskEnabled: true
+                maskSource: roundMask
+                maskThresholdMin: 0.5
+                maskSpreadAtMin: 0.0
+            }
+        }
     }
 
     // Drawn outside the masked pipeline so the border stays crisp.
@@ -120,7 +135,7 @@ Item {
         color: "transparent"
         border.color: distanceFromCenter === 0 ? Appearance.colors.textPrimary : "transparent"
         border.width: 2
-        radius: Appearance.sizing.wallpaper.itemRadius
+        radius: root.rounded ? Appearance.sizing.wallpaper.itemRadius : 0
     }
 
     MouseArea {

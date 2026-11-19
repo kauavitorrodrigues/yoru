@@ -316,6 +316,7 @@ To enable it:
    - `enabled` — turns the whole integration on/off: the overlay and the IPC toggle only exist while this is `true`.
    - `directory` — folder to scan for wallpapers. Leave empty to default to `~/Pictures/Wallpapers`.
    - `cacheDir` — folder to store generated thumbnails. Leave empty to default to `$XDG_CACHE_HOME/yoru/wallpaper-thumbnails` (or `~/.cache/yoru/wallpaper-thumbnails`).
+   - `roundedCards` — `true` (default) draws the thumbnails with rounded corners. Set to `false` for square cards, which skips the offscreen layers and mask behind the rounded corners and uses less GPU memory.
 
 3. Bind a key to toggle it in `hyprland.conf`:
 
