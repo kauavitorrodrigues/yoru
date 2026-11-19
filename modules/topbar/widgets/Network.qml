@@ -12,20 +12,42 @@ TopBarWidget {
 
     property bool connected: false
 
+    // One-shot check of the default route (runs at start and on each route change).
     Process {
-        id: netProc
-        command: ["sh", "-c", "ip route show default 2>/dev/null | grep -q default && echo 1 || echo 0"]
+        id: checkProc
+        command: ["ip", "route", "show", "default"]
         running: true
         stdout: StdioCollector {
-            onStreamFinished: root.connected = text.trim() === "1"
+            onStreamFinished: root.connected = text.trim().length > 0
         }
-        onExited: netTimer.restart()
+    }
+
+    // Debounce bursts of route events into a single check.
+    Timer {
+        id: debounce
+        interval: 300
+        repeat: false
+        onTriggered: {
+            if (!checkProc.running) checkProc.running = true;
+            else debounce.restart();
+        }
+    }
+
+    // Single long-lived monitor; restarted if it ever exits.
+    Process {
+        id: monitor
+        command: ["ip", "monitor", "route"]
+        running: true
+        stdout: SplitParser {
+            onRead: debounce.restart()
+        }
+        onExited: restartTimer.restart()
     }
 
     Timer {
-        id: netTimer
-        interval: 10000
+        id: restartTimer
+        interval: 5000
         repeat: false
-        onTriggered: netProc.running = true
+        onTriggered: monitor.running = true
     }
 }
