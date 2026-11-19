@@ -38,6 +38,8 @@ PanelWindow {
             return volumeComponent;
         case "battery":
             return batteryComponent;
+        case "bluetooth":
+            return bluetoothComponent;
         default:
             return null;
         }
@@ -108,6 +110,11 @@ PanelWindow {
     Component {
         id: batteryComponent
         Battery {}
+    }
+
+    Component {
+        id: bluetoothComponent
+        BluetoothIndicator {}
     }
 
     anchors {

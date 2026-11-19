@@ -65,7 +65,7 @@ Singleton {
                 property JsonObject topbar: JsonObject {
                     property list<string> left: ["workspaces"]
                     property list<string> center: ["clock"]
-                    property list<string> right: ["player", "memory", "network", "volume"]
+                    property list<string> right: ["player", "memory", "network", "bluetooth", "volume"]
                     property int memoryPollMs: 5000
                     property string mode: "bar" // "bar" | "island"
                 }

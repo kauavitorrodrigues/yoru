@@ -437,6 +437,12 @@ PanelWindow {
         visible: false
     }
 
+    // Probe for Bluetooth connection state, reusing the top bar widget's logic.
+    BluetoothIndicator {
+        id: bluetooth
+        visible: false
+    }
+
     // Probe for battery state (icon/percent/colors), reusing the top bar widget's logic.
     Battery {
         id: battery
@@ -451,19 +457,18 @@ PanelWindow {
     Component {
         id: idleView
 
-        // The clock sits in the exact middle: both sides are padded to the
-        // width of the wider one, so the pill stays symmetric around it.
+        // Sequential layout (left group, clock, right group): the pill is
+        // only as wide as its content, with no padding to balance the sides.
         Item {
             id: idle
 
-            readonly property real side: Math.max(leftGroup.implicitWidth, rightGroup.implicitWidth)
-
-            implicitWidth: clockText.implicitWidth + (side + 10) * 2
+            implicitWidth: leftGroup.implicitWidth + 10 + clockText.implicitWidth + 10 + rightGroup.implicitWidth
             implicitHeight: Math.max(clockText.implicitHeight, leftGroup.implicitHeight, rightGroup.implicitHeight)
 
             IslandText {
                 id: clockText
-                anchors.centerIn: parent
+                anchors.verticalCenter: parent.verticalCenter
+                x: leftGroup.implicitWidth + 10
                 text: Qt.formatDateTime(clock.date, "hh:mm")
                 font.bold: true
             }
@@ -520,6 +525,13 @@ PanelWindow {
                     anchors.verticalCenter: parent.verticalCenter
                     text: root.networkConnected ? "󰖩" : "󰖪"
                     color: root.networkConnected ? Appearance.colors.textPrimary : Appearance.colors.stateDanger
+                }
+
+                IslandText {
+                    anchors.verticalCenter: parent.verticalCenter
+                    visible: bluetooth.active
+                    text: "󰂱"
+                    color: Appearance.colors.textPrimary
                 }
 
                 BatteryIcon {
