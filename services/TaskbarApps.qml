@@ -24,6 +24,10 @@ Singleton {
         }
     }
 
+    // Entries are cached by normalized appId and updated in place, so the
+    // model keeps stable objects instead of recreating them on every change.
+    property var _entries: ({})
+
     property list<var> apps: {
 
         var map = new Map();
@@ -51,14 +55,32 @@ Singleton {
             map.get(key).toplevels.push(toplevel);
         }
 
+        const cache = root._entries;
         var values = [];
 
         for (const [key, value] of map) {
-            values.push(appEntryComp.createObject(null, {
-                appId: value.appId || key,
-                toplevels: value.toplevels,
-                pinned: value.pinned || false
-            }));
+            let entry = cache[key];
+            if (!entry) {
+                entry = appEntryComp.createObject(root, {
+                    appId: value.appId || key,
+                    toplevels: value.toplevels,
+                    pinned: value.pinned || false
+                });
+                cache[key] = entry;
+            } else {
+                entry.appId = value.appId || key;
+                entry.toplevels = value.toplevels;
+                entry.pinned = value.pinned || false;
+            }
+            values.push(entry);
+        }
+
+        // Drop entries for apps that are no longer pinned or running
+        for (const key of Object.keys(cache)) {
+            if (!map.has(key)) {
+                cache[key].destroy();
+                delete cache[key];
+            }
         }
 
         return values;
@@ -66,9 +88,9 @@ Singleton {
 
     component TaskbarAppEntry: QtObject {
         id: wrapper
-        required property string appId
-        required property list<var> toplevels
-        required property bool pinned
+        property string appId: ""
+        property list<var> toplevels: []
+        property bool pinned: false
     }
 
     Component {

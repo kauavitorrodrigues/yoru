@@ -1,29 +1,34 @@
 import ".."
 import QtQuick
 import Quickshell.Io
+import qs.services
 
 TopBarWidget {
     id: root
 
-    icon: "\uf4bc"
+    icon: ""
     label: usedGb.toFixed(1) + " GB"
 
     property real usedGb: 0
 
-    Process {
-        id: memProc
-        command: ["sh", "-c", "awk '/MemTotal/{t=$2} /MemAvailable/{a=$2} END{printf \"%.1f\", (t-a)/1048576}' /proc/meminfo"]
-        running: true
-        stdout: StdioCollector {
-            onStreamFinished: root.usedGb = parseFloat(text.trim()) || 0
-        }
-        onExited: timer.restart()
+    function parseMeminfo(text) {
+        const total = /^MemTotal:\s+(\d+)/m.exec(text);
+        const avail = /^MemAvailable:\s+(\d+)/m.exec(text);
+        if (!total || !avail) return;
+        root.usedGb = (parseInt(total[1]) - parseInt(avail[1])) / 1048576;
+    }
+
+    FileView {
+        id: meminfo
+        path: "/proc/meminfo"
+        onLoaded: root.parseMeminfo(text())
     }
 
     Timer {
-        id: timer
-        interval: 5000
-        repeat: false
-        onTriggered: memProc.running = true
+        interval: Math.max(1000, Settings.layout.topbar.memoryPollMs)
+        repeat: true
+        running: true
+        triggeredOnStart: true
+        onTriggered: meminfo.reload()
     }
 }

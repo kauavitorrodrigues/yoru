@@ -64,6 +64,7 @@ Singleton {
                     property list<string> left: ["workspaces"]
                     property list<string> center: ["clock"]
                     property list<string> right: ["player", "memory", "network", "volume"]
+                    property int memoryPollMs: 5000
                 }
             }
 
