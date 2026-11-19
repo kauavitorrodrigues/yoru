@@ -52,29 +52,35 @@ Singleton {
     }
 
     // Fuzzy indexes are built lazily on first use and dropped when `list` changes.
-    property var _preppedNames: null
-    property var _preppedIcons: null
+    // Lazy fuzzy-index cache. Kept as fields of a plain JS object rather than
+    // as properties: guessIcon() runs inside property bindings (the dock's icon
+    // `source`), and writing a property from within a binding that also reads
+    // it is reported as a binding loop.
+    readonly property var _cache: ({
+            names: null,
+            icons: null
+        })
     onListChanged: {
-        _preppedNames = null;
-        _preppedIcons = null;
+        _cache.names = null;
+        _cache.icons = null;
     }
 
     function getPreppedNames() {
-        if (_preppedNames === null)
-            _preppedNames = list.map(a => ({
+        if (_cache.names === null)
+            _cache.names = list.map(a => ({
                 name: Fuzzy.prepare(`${a.name} `),
                 entry: a
             }));
-        return _preppedNames;
+        return _cache.names;
     }
 
     function getPreppedIcons() {
-        if (_preppedIcons === null)
-            _preppedIcons = list.map(a => ({
+        if (_cache.icons === null)
+            _cache.icons = list.map(a => ({
                 name: Fuzzy.prepare(`${a.icon} `),
                 entry: a
             }));
-        return _preppedIcons;
+        return _cache.icons;
     }
 
     function fuzzyQuery(search: string): var { // Idk why list<DesktopEntry> doesn't work
