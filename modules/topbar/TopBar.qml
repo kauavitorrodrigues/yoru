@@ -36,6 +36,8 @@ PanelWindow {
             return networkComponent;
         case "volume":
             return volumeComponent;
+        case "battery":
+            return batteryComponent;
         default:
             return null;
         }
@@ -101,6 +103,11 @@ PanelWindow {
     Component {
         id: volumeComponent
         Volume {}
+    }
+
+    Component {
+        id: batteryComponent
+        Battery {}
     }
 
     anchors {
