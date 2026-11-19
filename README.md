@@ -10,7 +10,7 @@ Built with [Quickshell](https://quickshell.org/)
 
 </div>
 
-Yoru is a custom desktop shell for [Hyprland](https://hyprland.org/), built entirely in QML using the Quickshell framework. It provides a clean top bar, an application dock, and a music player widget with audio visualization.
+Yoru is a custom desktop shell for [Hyprland](https://hyprland.org/), built entirely in QML using the Quickshell framework. It provides a clean top bar (or an optional Dynamic Island), an application dock, and a music player widget with audio visualization.
 
 ## Screenshots
 
@@ -182,30 +182,38 @@ There is no in-app settings screen yet — it's plain JSON — but the shape abo
 - `layout.dock.autoHide` — when `true`, the dock stops reserving screen space (windows can use the full height) and only reveals itself as a floating overlay, hiding again shortly after the cursor leaves. Same behavior as macOS/GNOME auto-hide docks — nothing reflows when it appears or disappears, it just fades/slides over whatever's underneath. The reveal trigger is a hairline strip glued to the true bottom edge of the screen (not the dock's own — larger — floating footprint), so it doesn't fire when you're just interacting with normal app content near the bottom of the screen. Defaults to `false`.
 - Leaving any of the three `topbar` arrays or `dock.items` empty (`[]`) renders nothing in that spot — it does not fall back to a default.
 
-#### `layout.topbar.mode` / `modules.island` — notebook mode (Dynamic Island)
+#### `layout.topbar.mode` / `modules.island` — island mode (Dynamic Island)
 
-Set `layout.topbar.mode` to `"island"` to replace the top bar with a macOS-style island: a solid pill glued to the top edge of the screen, horizontally centered, with only its bottom corners rounded. It reserves no screen space and none of the other top bar widgets are shown. The default is `"bar"`.
+Set `layout.topbar.mode` to `"island"` to replace the top bar with a macOS-style Dynamic Island: a pill flush with the top edge of the screen, horizontally centered, with concave "wave" flares where it meets the edge. It reserves no screen space (handy on small laptop screens, but works on any desktop) and uses the same translucent surface color as the other widgets. The default is `"bar"`.
 
 ```json
 "layout": { "topbar": { "mode": "island" } },
 "modules": {
     "island": {
         "autoCollapseMs": 2500,
-        "expandOnHover": true,
+        "expandOnHover": false,
+        "closeOnLeave": false,
         "autoHide": false,
         "monitor": "",
-        "events": ["player", "volume", "workspace", "network"]
+        "events": ["player", "volume", "network"]
     }
 }
 ```
 
-- `events` — which events briefly expand the island: `"player"` (track/play state), `"volume"`, `"workspace"`, `"network"`. Voice dictation always takes over the island while recording.
+**Collapsed:** the current workspace number, the clock (centered), memory usage, the network state (wifi icon, red when offline) and a phone-style battery with a charge bolt. A mini waveform appears next to them while audio plays.
+
+**Events:** `player` (track / play state), `volume` and `network` changes briefly grow the island to show the new value, then it collapses again. Voice dictation takes the island over while recording.
+
+**Popover:** click the island (or use IPC) to open it. It shows the usual workspace switcher and a clock/date card, a media card (cover, title/artist, waveform, progress and controls) and quick tiles for volume (drag the bar, scroll, click to mute), network, memory and battery (with time remaining). Click again to close.
+
+- `events` — which events briefly expand the island: any of `"player"`, `"volume"`, `"network"`. Leave it empty to disable them.
 - `autoCollapseMs` — how long an event stays visible before the island collapses again.
-- `expandOnHover` — hovering the island shows the clock plus the current track.
-- `autoHide` — when `true`, the island is fully hidden and only appears while the cursor is in a hairline hotspot at the top-center of the screen (`appearance.sizing.island.hotspotWidth` wide), hiding again shortly after it leaves. Same behavior as the dock's `autoHide`. It also appears briefly for events, while recording, or while the popover is open. Defaults to `false`.
+- `expandOnHover` — when `true`, hovering also opens the popover (a click always does). Defaults to `false`.
+- `closeOnLeave` — when `true`, the popover closes shortly after the cursor leaves it. Defaults to `false`.
+- `autoHide` — when `true`, the island is fully hidden and only appears while the cursor is at the top-center of the screen (an invisible strip `appearance.sizing.island.hotspotWidth` wide), hiding again shortly after it leaves. Same idea as the dock's `autoHide`. It also appears briefly for events, while recording, or while the popover is open. Defaults to `false`.
 - `monitor` — output name to show the island on (e.g. `"eDP-1"`); empty means the first screen.
 - Manual control: `qs ipc call island toggle` (also `expand` / `collapse`).
-- Sizes and the surface color live in `appearance.sizing.island` and `appearance.colors.islandSurface`.
+- Sizing lives in `appearance.sizing.island`: `idleHeight`, `idleWidth`, `radius`, `padding`, `maxWidth`, `openMargin` (popover padding), `flare` (size of the wave at the top corners; `0` for straight sides), `hiddenHeight` and `hotspotWidth`.
 
 #### `modules.player.variant` — player widget layout
 
@@ -278,6 +286,10 @@ Every constant in `modules/common/Appearance.qml` is overridable here, grouped t
         "topbar": {
             "cardRadius": 15, "workspaceButtonFocusedSize": 13, "workspaceButtonIdleSize": 8
         },
+        "island": {
+            "idleHeight": 34, "idleWidth": 120, "radius": 20, "padding": 18, "maxWidth": 440,
+            "openMargin": 10, "flare": 12, "hiddenHeight": 4, "hotspotWidth": 360
+        },
         "wallpaper": {
             "overlayWidth": 1000, "overlayHeight": 550, "overlayRadius": 15,
             "itemWidth": 200, "itemHeight": 500, "itemRadius": 12
@@ -290,7 +302,7 @@ Every constant in `modules/common/Appearance.qml` is overridable here, grouped t
 - `animationCurves` — [`Easing`](https://doc.qt.io/qt-6/qml-qtquick-propertyanimation.html#easing.type-prop) curve type enum values used by those animations (leave these alone unless you know the specific Qt enum ints you want).
 - `fonts` — the shell's font family and the size scale (`xs`/`sm`/`md`/`base`, in px) used across widgets.
 - `colors` — every color token the shell draws with, as `"#RRGGBB"` or `"#AARRGGBB"` (alpha-first) hex strings — surfaces, text tones, hover/indicator states, and the danger/scrim colors.
-- `sizing` — per-feature layout constants: dock panel height/padding/icon sizing/radii, topbar card radius and workspace dot sizes, and wallpaper overlay/thumbnail dimensions.
+- `sizing` — per-feature layout constants: dock panel height/padding/icon sizing/radii, topbar card radius and workspace dot sizes, island dimensions, and wallpaper overlay/thumbnail dimensions.
 - `sizing.dock.padding` — insets the dock's row of items from its background on each side independently (`top`/`bottom`/`left`/`right`); e.g. `{ "left": 30, "right": 2 }` shifts the whole item row toward the right edge instead of centering it. Note this is unrelated to `layout.dock.items` — an unrecognized token there (anything other than `"apps"`/`"player"`) silently renders as a zero-width slot that still eats one `icons.spacing` gap, which looks just like uneven padding on whichever side it lands. If one edge looks off even with equal `padding.left`/`right`, check `layout.dock.items` for a typo before touching this.
 - `sizing.dock.icons` — everything about the dock's app icons grouped under one key instead of scattering `icon`-prefixed fields across `sizing.dock`: `size` (icon dimensions), `spacing` (gap between icons), `hoverPadding`/`hoverRadius` (the highlight circle behind an icon on hover — `hoverPadding` is how many pixels it extends past `size` on each side, so the highlight scales sensibly if you change `size` instead of looking too tight or too loose).
 
