@@ -26,7 +26,14 @@ Singleton {
         return false;
     }
 
-    property var amplitudes: new Array(20).fill(0)
+    readonly property int barCount: 7 // bars shown; cava emits 8 (bars = 8), the last is dropped
+    readonly property bool visualizerEnabled: Settings.modules.player.visualizer ?? true
+    // Number of visible player widgets that want the waveform (see Player.qml)
+    property int visualizerUsers: 0
+    readonly property bool visualizerActive: visualizerEnabled && isPlaying && visualizerUsers > 0
+
+    property var amplitudes: new Array(barCount).fill(0)
+    property var _scratch: new Array(barCount).fill(0)
     property bool _hasPending: false
     property string _pendingLine: ""
 
@@ -85,14 +92,11 @@ Singleton {
     Process {
         id: cavaProc
 
-        command: ["bash", "-c", "exec cava -p \"$HOME/.config/cava/configs/yoru.conf\""]
-        running: root.isPlaying
+        command: ["cava", "-p", Quickshell.env("HOME") + "/.config/cava/configs/yoru.conf"]
+        running: root.visualizerActive
         onExited: function(code, status) {
-            if (root.isPlaying)
-                Qt.callLater(() => {
-                return cavaProc.running = true;
-            });
-
+            if (root.visualizerActive)
+                Qt.callLater(() => { cavaProc.running = root.visualizerActive; });
         }
 
         stdout: SplitParser {
@@ -108,23 +112,34 @@ Singleton {
     }
 
     Timer {
-        interval: 16 // ~60fps
+        interval: 33 // ~30fps, matches cava framerate
         repeat: true
-        running: root.isPlaying
+        running: root.visualizerActive
         onTriggered: {
             if (!root._hasPending)
                 return ;
 
             root._hasPending = false;
             const parts = root._pendingLine.split(";");
-            const step = 3; // skip every 3 values
-            const arr = [];
-            for (let i = 0; i < 20; i += step) {
-                const val = parseInt(parts[i] ?? "0") || 0;
-                arr.push(Math.min(1, val / 1000));
+            const cur = root.amplitudes;
+            let changed = false;
+            const next = root._scratch;
+            for (let i = 0; i < root.barCount; i++) {
+                const val = Math.min(1, (parseInt(parts[i] ?? "0") || 0) / 1000);
+                next[i] = val;
+                if (val !== cur[i])
+                    changed = true;
             }
-            root.amplitudes = arr;
+            if (!changed)
+                return ;
+
+            root.amplitudes = next.slice(0, root.barCount); // only allocate when values changed
         }
+    }
+
+    onVisualizerActiveChanged: {
+        if (!visualizerActive && amplitudes.some((v) => v !== 0))
+            amplitudes = new Array(barCount).fill(0);
     }
 
 }

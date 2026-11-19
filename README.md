@@ -198,6 +198,8 @@ Controls the player's density, independent of where it's placed:
 - `"minimal"` — a Spotify icon in place of the album art, title and artist on a single line, and a shorter waveform to match.
 - `"compact"` — same as `"minimal"` but drops the artist entirely, showing only the Spotify icon and the track title. Handy for tight spots like the dock.
 
+`modules.player.visualizer` (default `true`) — set it to `false` to disable the waveform entirely; `cava` is then never launched. When enabled, `cava` only runs while a player widget is visible and Spotify is playing.
+
 #### `modules.workspaces` — workspace switcher bounds
 
 ```json
@@ -361,7 +363,7 @@ The install script handles all of these automatically on Arch.
 
 | Service | Description |
 |---------|-------------|
-| `PlayerService.qml` | Tracks MPRIS state (title, artist, art, play state), runs CAVA subprocess for waveform data at ~60fps |
+| `PlayerService.qml` | Tracks MPRIS state (title, artist, art, play state), runs CAVA subprocess for waveform data at ~30fps (only while the player widget is visible and `modules.player.visualizer` is not `false`) |
 | `AppSearch.qml` | Fuzzy app search with multi-step icon guessing fallback |
 | `Settings.qml` | Centralized persistent shell settings used by services/modules |
 | `TaskbarApps.qml` | Maintains a merged map of pinned + open apps grouped by app ID |
