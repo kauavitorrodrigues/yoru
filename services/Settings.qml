@@ -70,6 +70,7 @@ Singleton {
             property JsonObject modules: JsonObject {
                 property JsonObject player: JsonObject {
                     property string variant: "full"
+                    property bool visualizer: true
                 }
                 property JsonObject speech: JsonObject {
                     property bool enabled: false

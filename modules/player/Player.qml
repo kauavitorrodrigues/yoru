@@ -38,7 +38,26 @@ Loader {
         implicitWidth: content.implicitWidth + padding * 2
         implicitHeight: content.implicitHeight + 15
         opacity: 0
-        Component.onCompleted: enterAnim.start()
+        // Tell PlayerService a visible widget wants the visualizer (cava runs only then)
+        property bool wantsVisualizer: player.visible && player.opacity > 0
+        property bool _registered: false
+        onWantsVisualizerChanged: syncVisualizer()
+        function syncVisualizer() {
+            if (wantsVisualizer === _registered)
+                return ;
+            _registered = wantsVisualizer;
+            PlayerService.visualizerUsers += wantsVisualizer ? 1 : -1;
+        }
+        Component.onCompleted: {
+            enterAnim.start();
+            syncVisualizer();
+        }
+        Component.onDestruction: {
+            if (_registered) {
+                _registered = false;
+                PlayerService.visualizerUsers -= 1;
+            }
+        }
 
         Connections {
             function onActivePlayerChanged() {
