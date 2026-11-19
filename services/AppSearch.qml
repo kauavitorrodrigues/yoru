@@ -39,23 +39,43 @@ Singleton {
         }
     ]
 
-    // Deduped list to fix double icons
-    readonly property list<DesktopEntry> list: Array.from(DesktopEntries.applications.values)
-        .filter((app, index, self) => 
-            index === self.findIndex((t) => (
-                t.id === app.id
-            ))
-    )
-    
-    readonly property var preppedNames: list.map(a => ({
-        name: Fuzzy.prepare(`${a.name} `),
-        entry: a
-    }))
+    // Deduped list to fix double icons (first entry per id wins)
+    readonly property list<DesktopEntry> list: {
+        const seen = new Set();
+        const out = [];
+        for (const app of DesktopEntries.applications.values) {
+            if (seen.has(app.id)) continue;
+            seen.add(app.id);
+            out.push(app);
+        }
+        return out;
+    }
 
-    readonly property var preppedIcons: list.map(a => ({
-        name: Fuzzy.prepare(`${a.icon} `),
-        entry: a
-    }))
+    // Fuzzy indexes are built lazily on first use and dropped when `list` changes.
+    property var _preppedNames: null
+    property var _preppedIcons: null
+    onListChanged: {
+        _preppedNames = null;
+        _preppedIcons = null;
+    }
+
+    function getPreppedNames() {
+        if (_preppedNames === null)
+            _preppedNames = list.map(a => ({
+                name: Fuzzy.prepare(`${a.name} `),
+                entry: a
+            }));
+        return _preppedNames;
+    }
+
+    function getPreppedIcons() {
+        if (_preppedIcons === null)
+            _preppedIcons = list.map(a => ({
+                name: Fuzzy.prepare(`${a.icon} `),
+                entry: a
+            }));
+        return _preppedIcons;
+    }
 
     function fuzzyQuery(search: string): var { // Idk why list<DesktopEntry> doesn't work
         if (root.sloppySearch) {
@@ -68,7 +88,7 @@ Singleton {
                 .map(item => item.entry)
         }
 
-        return Fuzzy.go(search, preppedNames, {
+        return Fuzzy.go(search, getPreppedNames(), {
             all: true,
             key: "name"
         }).map(r => {
@@ -136,7 +156,7 @@ Singleton {
         if (iconExists(undescoreToKebabGuess)) return undescoreToKebabGuess;
 
         // Search in desktop entries
-        const iconSearchResults = Fuzzy.go(str, preppedIcons, {
+        const iconSearchResults = Fuzzy.go(str, getPreppedIcons(), {
             all: true,
             key: "name"
         }).map(r => {
