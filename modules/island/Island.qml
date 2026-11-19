@@ -195,7 +195,9 @@ PanelWindow {
                 root.surface("player");
         }
         function onIsPlayingChanged() {
-            root.surface("player");
+            // Only announce when playback starts; pausing/closing just updates the glance icon.
+            if (PlayerService.isPlaying)
+                root.surface("player");
         }
     }
 
@@ -272,7 +274,10 @@ PanelWindow {
         anchors.horizontalCenter: parent.horizontalCenter
 
         width: hidden ? root.sizes.hotspotWidth : Math.min(root.width - flare * 2, Math.max(root.sizes.idleWidth, contentWidth + pad * 2))
-        height: hidden ? root.sizes.hiddenHeight : Math.min(root.height, Math.max(root.sizes.idleHeight, contentHeight + (popover ? pad * 2 : 14)))
+        // Single-line views (idle, player, volume, network) all share the idle height.
+        readonly property bool singleLine: ["idle", "player", "volume", "network"].indexOf(root.view) !== -1
+
+        height: hidden ? root.sizes.hiddenHeight : (singleLine ? root.sizes.idleHeight : Math.min(root.height, Math.max(root.sizes.idleHeight, contentHeight + (popover ? pad * 2 : 14))))
 
         Behavior on width {
             NumberAnimation {
@@ -488,6 +493,22 @@ PanelWindow {
                     sourceComponent: MiniWave {}
                 }
 
+                // No waveform (Spotify Web in the browser, or paused): Spotify glyph,
+                // green while playing, dimmed while paused, gone when the player closes.
+                IslandText {
+                    anchors.verticalCenter: parent.verticalCenter
+                    visible: PlayerService.title !== "" && !PlayerService.hasAudioContext
+                    text: "󰓇"
+                    color: PlayerService.isPlaying ? "#1DB954" : Appearance.colors.textSecondary
+
+                    Behavior on color {
+                        ColorAnimation {
+                            duration: Appearance.animation.medium
+                            easing.type: Appearance.animationCurves.inOutQuad
+                        }
+                    }
+                }
+
                 Row {
                     anchors.verticalCenter: parent.verticalCenter
                     spacing: 4
@@ -551,12 +572,6 @@ PanelWindow {
 
             WorkspaceBadge {
                 anchors.verticalCenter: parent.verticalCenter
-            }
-
-            Loader {
-                anchors.verticalCenter: parent.verticalCenter
-                active: PlayerService.isPlaying
-                sourceComponent: MiniWave {}
             }
 
             IslandText {
