@@ -10,11 +10,13 @@ TopBarWidget {
     label: usedGb.toFixed(1) + " GB"
 
     property real usedGb: 0
+    property real totalGb: 0
 
     function parseMeminfo(text) {
         const total = /^MemTotal:\s+(\d+)/m.exec(text);
         const avail = /^MemAvailable:\s+(\d+)/m.exec(text);
         if (!total || !avail) return;
+        root.totalGb = parseInt(total[1]) / 1048576;
         root.usedGb = (parseInt(total[1]) - parseInt(avail[1])) / 1048576;
     }
 

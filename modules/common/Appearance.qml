@@ -87,6 +87,17 @@ Singleton {
             property int workspaceButtonFocusedSize: Settings.appearance.sizing.topbar.workspaceButtonFocusedSize
             property int workspaceButtonIdleSize: Settings.appearance.sizing.topbar.workspaceButtonIdleSize
         }
+        property QtObject island: QtObject {
+            property int idleHeight: Settings.appearance.sizing.island.idleHeight
+            property int idleWidth: Settings.appearance.sizing.island.idleWidth
+            property int hiddenHeight: Settings.appearance.sizing.island.hiddenHeight
+            property int hotspotWidth: Settings.appearance.sizing.island.hotspotWidth
+            property int radius: Settings.appearance.sizing.island.radius
+            property int padding: Settings.appearance.sizing.island.padding
+            property int maxWidth: Settings.appearance.sizing.island.maxWidth
+            property int openMargin: Settings.appearance.sizing.island.openMargin
+            property int flare: Settings.appearance.sizing.island.flare
+        }
         property QtObject wallpaper: QtObject {
             property int overlayWidth: Settings.appearance.sizing.wallpaper.overlayWidth
             property int overlayHeight: Settings.appearance.sizing.wallpaper.overlayHeight
