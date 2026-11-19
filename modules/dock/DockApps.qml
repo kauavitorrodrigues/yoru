@@ -15,6 +15,9 @@ Item {
     property real maxWindowPreviewWidth: 300
     property real windowControlsHeight: 30
     property real buttonPadding: 5
+    // "live" | "static" | "off" (off = title-only list); anything else falls back to "live"
+    readonly property string previewMode: ["live", "static", "off"].includes(Settings.layout.dock.preview) ? Settings.layout.dock.preview : "live"
+    readonly property int previewMaxWindows: Math.max(1, Settings.layout.dock.previewMaxWindows)
 
     property Item lastHoveredButton
     property bool buttonHovered: false
@@ -186,14 +189,14 @@ Item {
                     Repeater {
 
                         model: ScriptModel {
-                            values: previewPopup.appTopLevel?.toplevels ?? []
+                            values: (previewPopup.appTopLevel?.toplevels ?? []).slice(0, root.previewMaxWindows)
                         }
 
                         Button {
 
                             id: windowButton
                             required property var modelData
-                            property bool hasContent: screencopyView.hasContent
+                            property bool hasContent: root.previewMode === "off" || (previewLoader.item?.hasContent ?? false)
                             property bool entered: false
                             padding: 0
                             opacity: (previewPopup.show && entered) ? 1 : 0
@@ -230,22 +233,42 @@ Item {
 
                             contentItem: ColumnLayout {
 
-                                implicitWidth: screencopyView.implicitWidth
-                                implicitHeight: screencopyView.implicitHeight
+                                implicitWidth: previewLoader.item?.implicitWidth ?? 0
+                                implicitHeight: previewLoader.item?.implicitHeight ?? 0
 
-                                ScreencopyView {
+                                Loader {
+                                    id: previewLoader
+                                    sourceComponent: root.previewMode === "off" ? titleComponent : screencopyComponent
+                                    onItemChanged: previewPopup.updatePreviewReadiness()
+                                }
 
-                                    id: screencopyView
-                                    captureSource: windowButton.modelData
-                                    live: true
-                                    paintCursor: true
-                                    constraintSize: Qt.size(root.maxWindowPreviewWidth, root.maxWindowPreviewHeight)
-                                    onHasContentChanged: {
-                                        previewPopup.updatePreviewReadiness();
+                                Component {
+                                    id: screencopyComponent
+
+                                    // No layer.enabled: it only duplicated the texture; the view
+                                    // is drawn as-is (no shader effect / rounded clipping).
+                                    ScreencopyView {
+                                        captureSource: windowButton.modelData
+                                        live: root.previewMode === "live"
+                                        paintCursor: true
+                                        constraintSize: Qt.size(root.maxWindowPreviewWidth, root.maxWindowPreviewHeight)
+                                        onHasContentChanged: previewPopup.updatePreviewReadiness()
                                     }
+                                }
 
-                                    layer.enabled: true
+                                Component {
+                                    id: titleComponent
 
+                                    Text {
+                                        text: windowButton.modelData?.title ?? ""
+                                        color: Appearance.colors.textPrimary
+                                        font.family: Appearance.fonts.primary
+                                        font.pixelSize: Appearance.fonts.sizes.base
+                                        elide: Text.ElideRight
+                                        padding: 10
+                                        width: Math.min(implicitWidth, root.maxWindowPreviewWidth)
+                                        readonly property bool hasContent: true
+                                    }
                                 }
 
                             }
