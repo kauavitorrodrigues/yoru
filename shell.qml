@@ -32,6 +32,8 @@ ShellRoot {
         component: WallpaperOverlay {}
     }
 
+    WallpaperSync {}
+
     LazyLoader {
         active: Settings.modules.wallpaper.enabled
         component: WallpaperController {}
