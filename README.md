@@ -277,7 +277,7 @@ Controls the player's density, independent of where it's placed:
 ```
 
 - `dockPreview` (`"live"` | `"static"` | `"off"`) and `dockPreviewMaxWindows` — dock window previews (`live` keeps a screencopy stream per window).
-- `screens` — which monitors get a dock: `["all"]`, `["primary"]` (the first one), or monitor names such as `["DP-1"]`. The top bar and the island already live on a single monitor (the island's is `modules.island.monitor`).
+- `screens` — which monitors get a dock: `["all"]`, `["primary"]` (the first one), or monitor names such as `["DP-1"]`. If none of the listed monitors is connected (e.g. the external one is unplugged), the dock falls back to the first screen. The top bar and the island already live on a single monitor (the island's is `modules.island.monitor`).
 - `player.visualizer` — `false` means `cava` is never launched.
 - `wallpaper.animatedPreview` — `false` skips generating and playing animated GIF previews. `thumbWorkers` is the thumbnail decoding pool size and `maxSourcePixels` rejects source images above it instead of decoding them.
 - `topbar.memoryPollMs` — how often the memory widget refreshes.
