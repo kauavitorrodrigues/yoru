@@ -15,6 +15,59 @@ Singleton {
     property alias layout: settingsJsonAdapter.layout
     property alias modules: settingsJsonAdapter.modules
     property alias appearance: settingsJsonAdapter.appearance
+    property alias performance: settingsJsonAdapter.performance
+
+    // Preset values per profile. "full" applies none (the individual settings win);
+    // "balanced" and "lite" override them, and any explicit `performance.*` value
+    // overrides the preset in turn. A key missing from a preset falls back to the
+    // regular setting.
+    readonly property var performancePresets: ({
+            "full": {},
+            "balanced": {
+                "dockPreview": "static",
+                "dockPreviewMaxWindows": 3,
+                "thumbWorkers": 2,
+                "maxSourcePixels": 80000000
+            },
+            "lite": {
+                "dockPreview": "off",
+                "dockPreviewMaxWindows": 3,
+                "visualizer": false,
+                "animatedPreview": false,
+                "thumbWorkers": 1,
+                "maxSourcePixels": 40000000,
+                "screens": ["primary"],
+                "memoryPollMs": 10000
+            }
+        })
+    readonly property var activePreset: performancePresets[performance.profile] ?? ({})
+
+    // explicit performance.* value > profile preset > regular setting
+    function perf(override, key, fallback) {
+        if (override !== null && override !== undefined)
+            return override;
+        const preset = activePreset[key];
+        return preset !== undefined ? preset : fallback;
+    }
+
+    readonly property string dockPreview: perf(performance.dockPreview, "dockPreview", layout.dock.preview)
+    readonly property int dockPreviewMaxWindows: perf(performance.dockPreviewMaxWindows, "dockPreviewMaxWindows", layout.dock.previewMaxWindows)
+    readonly property bool visualizer: perf(performance.player.visualizer, "visualizer", modules.player.visualizer)
+    readonly property bool animatedPreview: perf(performance.wallpaper.animatedPreview, "animatedPreview", true)
+    readonly property int thumbWorkers: perf(performance.wallpaper.thumbWorkers, "thumbWorkers", 2)
+    readonly property real maxSourcePixels: perf(performance.wallpaper.maxSourcePixels, "maxSourcePixels", 100000000)
+    readonly property int memoryPollMs: perf(performance.topbar.memoryPollMs, "memoryPollMs", layout.topbar.memoryPollMs)
+    // [] or ["all"] = every monitor; ["primary"] = the first one; otherwise monitor names.
+    readonly property var screenFilter: perf(performance.screens, "screens", [])
+
+    function screenEnabled(screen) {
+        const f = screenFilter;
+        if (!f || f.length === 0 || f.includes("all"))
+            return true;
+        if (f.includes("primary") && Quickshell.screens.length > 0 && screen === Quickshell.screens[0])
+            return true;
+        return f.includes(screen.name);
+    }
 
     function setDockPinnedApps(appIds) {
         settingsJsonAdapter.layout.dock.pinnedApps = appIds;
@@ -100,6 +153,26 @@ Singleton {
                 property JsonObject workspaces: JsonObject {
                     property int defaultCount: 5
                     property int maxCount: 10
+                }
+            }
+
+            // One-switch memory/CPU presets. Every field besides `profile` is an optional
+            // override (null = use the profile preset, or the regular setting for "full").
+            property JsonObject performance: JsonObject {
+                property string profile: "full" // "full" | "balanced" | "lite"
+                property var dockPreview: null // "live" | "static" | "off"
+                property var dockPreviewMaxWindows: null
+                property var screens: null // list: ["all"] | ["primary"] | monitor names (dock only)
+                property JsonObject player: JsonObject {
+                    property var visualizer: null
+                }
+                property JsonObject wallpaper: JsonObject {
+                    property var animatedPreview: null
+                    property var thumbWorkers: null
+                    property var maxSourcePixels: null
+                }
+                property JsonObject topbar: JsonObject {
+                    property var memoryPollMs: null
                 }
             }
 

@@ -27,7 +27,7 @@ Singleton {
     }
 
     readonly property int barCount: 7 // bars shown; cava emits 8 (bars = 8), the last is dropped
-    readonly property bool visualizerEnabled: Settings.modules.player.visualizer ?? true
+    readonly property bool visualizerEnabled: Settings.visualizer ?? true
     // Number of visible player widgets that want the waveform (see Player.qml)
     property int visualizerUsers: 0
     readonly property bool visualizerActive: visualizerEnabled && isPlaying && visualizerUsers > 0

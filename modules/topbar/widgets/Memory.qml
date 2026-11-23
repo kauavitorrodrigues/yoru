@@ -27,7 +27,7 @@ TopBarWidget {
     }
 
     Timer {
-        interval: Math.max(1000, Settings.layout.topbar.memoryPollMs)
+        interval: Math.max(1000, Settings.memoryPollMs)
         repeat: true
         running: true
         triggeredOnStart: true

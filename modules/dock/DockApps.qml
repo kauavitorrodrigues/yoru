@@ -16,8 +16,8 @@ Item {
     property real windowControlsHeight: 30
     property real buttonPadding: 5
     // "live" | "static" | "off" (off = title-only list); anything else falls back to "live"
-    readonly property string previewMode: ["live", "static", "off"].includes(Settings.layout.dock.preview) ? Settings.layout.dock.preview : "live"
-    readonly property int previewMaxWindows: Math.max(1, Settings.layout.dock.previewMaxWindows)
+    readonly property string previewMode: ["live", "static", "off"].includes(Settings.dockPreview) ? Settings.dockPreview : "live"
+    readonly property int previewMaxWindows: Math.max(1, Settings.dockPreviewMaxWindows)
 
     property Item lastHoveredButton
     property bool buttonHovered: false

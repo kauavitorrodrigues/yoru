@@ -2,6 +2,7 @@
 """Generate wallpaper picker thumbnails, keeping peak memory low.
 
 usage: generate_thumbnails.py <cache_dir> <width> <height> [--workers N]
+                              [--max-pixels N] [--no-animated]
                               (--dir <wallpaper_dir> | [wallpaper_path ...])
 
 Prefer --dir: the script scans the directory itself, so the file list never
@@ -30,6 +31,8 @@ MAX_GIF_FRAMES = 150
 # Pillow raises DecompressionBombError above 2x this value (~200M pixels),
 # which rejects absurdly large files instead of decoding them.
 MAX_IMAGE_PIXELS = 100_000_000
+# --no-animated skips the downscaled GIF previews (static thumbnails only).
+ANIMATED_PREVIEWS = True
 
 CACHE_NAME_RE = re.compile(r"^[0-9a-f]{64}_\d+x\d+\.(jpg|gif)$")
 
@@ -150,7 +153,7 @@ def generate(cache_dir: str, src_path: str, width: int, height: int) -> dict:
     # static file already exists on disk, every future rescan would retry
     # and fail the same way, leaving the item permanently blank.
     ext = os.path.splitext(src_path)[1].lower()
-    if ext in GIF_EXTENSIONS:
+    if ANIMATED_PREVIEWS and ext in GIF_EXTENSIONS:
         try:
             animated_dst = cache_path(cache_dir, src_path, width, height, "gif")
             if not os.path.exists(animated_dst):
@@ -187,6 +190,7 @@ def prune_cache(cache_dir: str, paths: list, width: int, height: int) -> None:
 
 
 def _parse_args(argv: list):
+    global MAX_IMAGE_PIXELS, ANIMATED_PREVIEWS
     workers = DEFAULT_WORKERS
     directory = None
     positional = []
@@ -196,6 +200,12 @@ def _parse_args(argv: list):
         if arg == "--workers" and i + 1 < len(argv):
             workers = max(1, int(argv[i + 1]))
             i += 2
+        elif arg == "--max-pixels" and i + 1 < len(argv):
+            MAX_IMAGE_PIXELS = max(1, int(float(argv[i + 1])))
+            i += 2
+        elif arg == "--no-animated":
+            ANIMATED_PREVIEWS = False
+            i += 1
         elif arg == "--dir" and i + 1 < len(argv):
             directory = argv[i + 1]
             i += 2
@@ -208,7 +218,7 @@ def _parse_args(argv: list):
 def main() -> None:
     workers, directory, positional = _parse_args(sys.argv[1:])
     if len(positional) < 3:
-        print("usage: generate_thumbnails.py <cache_dir> <width> <height> [--workers N] (--dir <wallpaper_dir> | [wallpaper_path ...])", file=sys.stderr)
+        print("usage: generate_thumbnails.py <cache_dir> <width> <height> [--workers N] [--max-pixels N] [--no-animated] (--dir <wallpaper_dir> | [wallpaper_path ...])", file=sys.stderr)
         sys.exit(1)
 
     cache_dir = positional[0]
