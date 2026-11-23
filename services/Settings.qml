@@ -60,17 +60,17 @@ Singleton {
     // [] or ["all"] = every monitor; ["primary"] = the first one; otherwise monitor names.
     readonly property var screenFilter: perf(performance.screens, "screens", [])
 
+    // If none of the listed monitors is connected (e.g. the external one is
+    // unplugged), fall back to the first screen so the dock is never lost.
     function screenEnabled(screen) {
         const f = screenFilter;
         if (!f || f.length === 0 || f.includes("all"))
             return true;
-        if (f.includes("primary") && Quickshell.screens.length > 0 && screen === Quickshell.screens[0])
-            return true;
-        return f.includes(screen.name);
-    }
-
-    function setDockPinnedApps(appIds) {
-        settingsJsonAdapter.layout.dock.pinnedApps = appIds;
+        const screens = Quickshell.screens;
+        const matches = s => (f.includes("primary") && s === screens[0]) || f.includes(s.name);
+        if (!screens.some(matches))
+            return screen === screens[0];
+        return matches(screen);
     }
 
     Timer {
