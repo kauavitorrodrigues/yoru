@@ -117,10 +117,11 @@ If something doesn't work:
 
 ### Configuration
 
-`~/.config/yoru/settings.json` is organized into three top-level sections:
+`~/.config/yoru/settings.json` is organized into four top-level sections:
 
 - **`layout`** — purely structural: which zone (dock / top bar left / center / right) each widget renders in, and in what order. No visual styling lives here.
 - **`modules`** — per-widget behavior/config: the player's variant, the voice dictation and wallpaper picker opt-in flags, the workspace count bounds.
+- **`performance`** — one-switch memory/CPU presets for low-RAM machines (see [Performance profiles](#performance-profiles-low-ram-machines)).
 - **`appearance`** — every visual token the shell renders with: animation durations/curves, font family/sizes, colors, and per-feature sizing (icon size, radii, padding, etc.). This is a 1:1 override of `Appearance.qml`'s defaults — anything you don't set falls back to the built-in value.
 
 ```json
@@ -248,6 +249,58 @@ Controls the player's density, independent of where it's placed:
 
 - `defaultCount` — minimum number of workspace buttons always shown.
 - `maxCount` — hard ceiling; the switcher grows past `defaultCount` as you focus higher workspace numbers, up to this limit.
+
+#### Performance profiles (low-RAM machines)
+
+`performance.profile` turns the heavy features down in one go. Every other key under `performance` is an optional override: **explicit `performance.*` value > profile preset > the regular setting** (`layout.dock.preview`, `modules.player.visualizer`, ...).
+
+| Profile | Effect |
+| --- | --- |
+| `"full"` (default) | No preset: the regular settings apply as-is. |
+| `"balanced"` | Static dock previews, 2 thumbnail workers, source images capped at 80M pixels. |
+| `"lite"` | Dock previews off, no cava visualizer, no animated GIF previews in the wallpaper picker, 1 thumbnail worker, source images capped at 40M pixels, dock on the primary monitor only, memory widget polled every 10 s. |
+
+```json
+"performance": {
+    "profile": "lite",
+    "dockPreview": "static",
+    "dockPreviewMaxWindows": 3,
+    "screens": ["primary"],
+    "player": { "visualizer": false },
+    "wallpaper": {
+        "animatedPreview": false,
+        "thumbWorkers": 1,
+        "maxSourcePixels": 40000000
+    },
+    "topbar": { "memoryPollMs": 10000 }
+}
+```
+
+- `dockPreview` (`"live"` | `"static"` | `"off"`) and `dockPreviewMaxWindows` — dock window previews (`live` keeps a screencopy stream per window).
+- `screens` — which monitors get a dock: `["all"]`, `["primary"]` (the first one), or monitor names such as `["DP-1"]`. The top bar and the island already live on a single monitor (the island's is `modules.island.monitor`).
+- `player.visualizer` — `false` means `cava` is never launched.
+- `wallpaper.animatedPreview` — `false` skips generating and playing animated GIF previews. `thumbWorkers` is the thumbnail decoding pool size and `maxSourcePixels` rejects source images above it instead of decoding them.
+- `topbar.memoryPollMs` — how often the memory widget refreshes.
+
+Leave a key out (or `null`) to use the preset / regular setting.
+
+#### System-level safety nets
+
+These live outside Yoru but matter most on 8 GB machines:
+
+```ini
+# hyprland.conf
+exec-once = systemd-run --user --scope \
+  -p MemoryHigh=350M -p MemoryMax=500M -p MemorySwapMax=0 \
+  env MALLOC_ARENA_MAX=2 MALLOC_TRIM_THRESHOLD_=65536 \
+  quickshell -p ~/.config/quickshell/yoru
+```
+
+- `MemoryMax` makes the kernel kill only the shell on a leak, instead of the whole session. `MemoryHigh` throttles it before that point.
+- `MALLOC_ARENA_MAX=2` usually reduces the RSS of multithreaded Qt apps.
+- On 8 GB machines, consider [`zram-generator`](https://github.com/systemd/zram-generator) for compressed swap in RAM.
+- Voice dictation (`yoru-speech` / Whisper) is the largest optional consumer: prefer a `tiny` or `base` model and on-demand loading.
+- `quickshell-git` builds from the AUR; on low-RAM machines use `MAKEFLAGS=-j2` to keep the compile from exhausting memory.
 
 #### `appearance` — theme tokens
 

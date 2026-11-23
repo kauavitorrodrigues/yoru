@@ -1,6 +1,7 @@
 import Quickshell.Io
 import QtQuick
 import "../common"
+import "../../services"
 
 // Manages the wallpaper list, thumbnail generation, and wallpaper application
 // by shelling out to Python scripts for the scan/thumbnail/query work.
@@ -107,7 +108,10 @@ Item {
                 if (results.length === 0)
                     return;
 
-                thumbProcess.command = ["python3", root.scriptDir + "generate_thumbnails.py", root.cacheDir, String(Appearance.sizing.wallpaper.itemWidth), String(Appearance.sizing.wallpaper.itemHeight), "--dir", root.directory];
+                const args = ["python3", root.scriptDir + "generate_thumbnails.py", root.cacheDir, String(Appearance.sizing.wallpaper.itemWidth), String(Appearance.sizing.wallpaper.itemHeight), "--workers", String(Math.max(1, Settings.thumbWorkers)), "--max-pixels", String(Math.round(Settings.maxSourcePixels))];
+                if (!Settings.animatedPreview)
+                    args.push("--no-animated");
+                thumbProcess.command = args.concat(["--dir", root.directory]);
                 thumbProcess.running = true;
             }
         }

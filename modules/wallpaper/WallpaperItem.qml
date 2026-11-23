@@ -26,7 +26,7 @@ Item {
     // WallpaperState.visible is required here: distanceFromCenter doesn't
     // change when the overlay closes, so without it a centered GIF kept
     // decoding at 75-90% CPU for several seconds after the picker closed.
-    readonly property bool showAnimated: isAnimated && distanceFromCenter === 0 && WallpaperState.visible
+    readonly property bool showAnimated: Settings.animatedPreview && isAnimated && distanceFromCenter === 0 && WallpaperState.visible
     // Empty until the cache has produced a downscaled copy of the GIF (see
     // generate_thumbnails.py), and whenever not shown, so the AnimatedImage
     // below only ever decodes that small cached file, never the original.

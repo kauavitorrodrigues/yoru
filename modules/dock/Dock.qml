@@ -13,7 +13,7 @@ Scope {
     Variants {
 
         // For each monitor
-        model: Quickshell.screens
+        model: Quickshell.screens.filter(s => Settings.screenEnabled(s))
 
         Scope {
 
