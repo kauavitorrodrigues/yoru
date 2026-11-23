@@ -80,6 +80,8 @@ Column {
         property real progress: -1
         property color progressColor: Appearance.colors.indicatorActive
         property bool seekable: false
+        // Optional item shown in the top-right corner of the tile.
+        property Component accessory: null
 
         signal clicked
         signal scrolled(real dy)
@@ -93,6 +95,17 @@ Column {
             anchors.fill: parent
             onClicked: tile.clicked()
             onWheel: wheel => tile.scrolled(wheel.angleDelta.y)
+        }
+
+        Loader {
+            sourceComponent: tile.accessory
+            active: tile.accessory !== null
+            anchors {
+                top: parent.top
+                right: parent.right
+                topMargin: 14
+                rightMargin: 12
+            }
         }
 
         Column {
@@ -241,6 +254,19 @@ Column {
             subtitle: {
                 const n = bluetoothProbe.connectedDevices.length;
                 return n > 1 ? "Bluetooth · +" + (n - 1) : "Bluetooth";
+            }
+            accessory: Component {
+                BatteryIcon {
+                    probe: QtObject {
+                        readonly property var dev: bluetoothProbe.active ? bluetoothProbe.connectedDevices[0] : null
+                        readonly property bool has: dev !== null && dev.batteryAvailable
+                        readonly property int percent: has ? Math.round(dev.battery * 100) : 0
+                        readonly property bool charging: false
+                        readonly property bool pluggedIn: false
+                        readonly property bool low: has && percent <= 15
+                    }
+                    visible: probe.has
+                }
             }
             progress: bluetoothProbe.active && bluetoothProbe.connectedDevices[0].batteryAvailable ? bluetoothProbe.connectedDevices[0].battery : -1
         }
