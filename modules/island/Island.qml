@@ -135,7 +135,11 @@ PanelWindow {
     color: "transparent"
     focusable: false
     aboveWindows: true
-    exclusionMode: ExclusionMode.Ignore
+    // With reserveSpace, tiled windows start below the idle pill. The zone is
+    // fixed at the idle height so windows don't jump while the pill expands
+    // (the popover/events just float over them). Ignored while autoHide is on.
+    exclusionMode: cfg.reserveSpace && !autoHide ? ExclusionMode.Normal : ExclusionMode.Ignore
+    exclusiveZone: sizes.idleHeight
     WlrLayershell.namespace: "quickshell:island"
 
     // Fixed-size window: only the pill is drawn and clickable (see mask), so the

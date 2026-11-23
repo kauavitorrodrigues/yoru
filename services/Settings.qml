@@ -94,6 +94,7 @@ Singleton {
                     property bool closeOnLeave: false // close shortly after the cursor leaves
                     property bool autoHide: false // hide until the cursor reaches the top-center of the screen
                     property string monitor: "" // "" = first screen
+                    property bool reserveSpace: false // keep windows below the idle pill (ignored with autoHide)
                     property list<string> events: ["player", "volume", "network"]
                 }
                 property JsonObject workspaces: JsonObject {

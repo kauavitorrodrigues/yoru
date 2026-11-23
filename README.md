@@ -184,7 +184,7 @@ There is no in-app settings screen yet — it's plain JSON — but the shape abo
 
 #### `layout.topbar.mode` / `modules.island` — island mode (Dynamic Island)
 
-Set `layout.topbar.mode` to `"island"` to replace the top bar with a macOS-style Dynamic Island: a pill flush with the top edge of the screen, horizontally centered, with concave "wave" flares where it meets the edge. It reserves no screen space (handy on small laptop screens, but works on any desktop) and uses the same translucent surface color as the other widgets. The default is `"bar"`.
+Set `layout.topbar.mode` to `"island"` to replace the top bar with a macOS-style Dynamic Island: a pill flush with the top edge of the screen, horizontally centered, with concave "wave" flares where it meets the edge. By default it reserves no screen space (handy on small laptop screens); set `reserveSpace` to keep windows below it and uses the same translucent surface color as the other widgets. The default is `"bar"`.
 
 ```json
 "layout": { "topbar": { "mode": "island" } },
@@ -195,6 +195,7 @@ Set `layout.topbar.mode` to `"island"` to replace the top bar with a macOS-style
         "closeOnLeave": false,
         "autoHide": false,
         "monitor": "",
+        "reserveSpace": false,
         "events": ["player", "volume", "network"]
     }
 }
@@ -212,6 +213,7 @@ Set `layout.topbar.mode` to `"island"` to replace the top bar with a macOS-style
 - `closeOnLeave` — when `true`, the popover closes shortly after the cursor leaves it. Defaults to `false`.
 - `autoHide` — when `true`, the island is fully hidden and only appears while the cursor is at the top-center of the screen (an invisible strip `appearance.sizing.island.hotspotWidth` wide), hiding again shortly after it leaves. Same idea as the dock's `autoHide`. It also appears briefly for events, while recording, or while the popover is open. Defaults to `false`.
 - `monitor` — output name to show the island on (e.g. `"eDP-1"`); empty means the first screen.
+- `reserveSpace` — when `true`, the island reserves `sizing.island.idleHeight` pixels at the top of its monitor so tiled windows don't go under it. The zone stays fixed while the island expands. Has no effect with `autoHide`. Defaults to `false`.
 - Manual control: `qs ipc call island toggle` (also `expand` / `collapse`).
 - Sizing lives in `appearance.sizing.island`: `idleHeight`, `idleWidth`, `radius`, `padding`, `maxWidth`, `openMargin` (popover padding), `flare` (size of the wave at the top corners; `0` for straight sides), `hiddenHeight` and `hotspotWidth`.
 
