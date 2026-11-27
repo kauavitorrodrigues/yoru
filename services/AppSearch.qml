@@ -58,11 +58,13 @@ Singleton {
     // it is reported as a binding loop.
     readonly property var _cache: ({
             names: null,
-            icons: null
+            icons: null,
+            startupClasses: null
         })
     onListChanged: {
         _cache.names = null;
         _cache.icons = null;
+        _cache.startupClasses = null;
     }
 
     function getPreppedNames() {
@@ -120,12 +122,33 @@ Singleton {
         return str.toLowerCase().replace(/_/g, "-");
     }
 
+    // Index of desktop entries by StartupWMClass (lowercased), rebuilt when `list` changes.
+    // Window classes don't always match the desktop entry id (e.g. class "orca"
+    // belongs to "orca-ide.desktop"), and must win over same-named theme icons.
+    function getStartupClassIndex() {
+        if (_cache.startupClasses === null) {
+            const index = {};
+            for (const app of list) {
+                const cls = (app.startupClass ?? "").toLowerCase();
+                if (cls.length > 0 && !(cls in index)) index[cls] = app;
+            }
+            _cache.startupClasses = index;
+        }
+        return _cache.startupClasses;
+    }
+
+    // Icon declared by the desktop entry matching a window class, or "" if none.
+    function entryIconForClass(str) {
+        const entry = DesktopEntries.byId(str) ?? getStartupClassIndex()[str.toLowerCase()];
+        return entry && entry.icon ? entry.icon : "";
+    }
+
     function guessIcon(str) {
         if (!str || str.length == 0) return "image-missing";
 
-        // Quickshell's desktop entry lookup
-        const entry = DesktopEntries.byId(str);
-        if (entry) return entry.icon;
+        // Desktop entry (by id or StartupWMClass) -> use the icon it declares
+        const declared = entryIconForClass(str);
+        if (declared.length > 0) return declared;
 
         // Normal substitutions
         if (substitutions[str]) return substitutions[str];
